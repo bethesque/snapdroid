@@ -15,7 +15,9 @@ android {
             cmake {
                 version "3.22.1"
                 cppFlags "-std=c++14"
-                arguments '-DANDROID_STL=c++_static', '-DBUILD_SERVER=OFF', '-DBUILD_TESTS=OFF'
+                arguments '-DANDROID_STL=c++_static', '-DBUILD_SERVER=OFF', '-DBUILD_TESTS=OFF', \
+                          '-DCMAKE_EXE_LINKER_FLAGS=-Wl,-z,max-page-size=16384', \
+                          '-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-z,max-page-size=16384'
                 abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
             }
         }
