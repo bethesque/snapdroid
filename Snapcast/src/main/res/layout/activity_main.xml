@@ -63,6 +63,13 @@
             android:layout_height="wrap_content"
             android:text="@string/action_refresh_notifications" />
 
+        <Button
+            android:id="@+id/btnStopPhoneAlarm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/action_stop_phone_alarm" />
+
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

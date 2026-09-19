@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
@@ -44,6 +46,7 @@ public class CalendarAlarmScheduler {
     private static final int CONNECT_TIMEOUT_MS = 10_000;
     private static final int READ_TIMEOUT_MS = 15_000;
     private static final String NOTIFICATIONS_PATH = "/alarm/notifications";
+    private static final int SNAPSERVER_REACHABLE_TIMEOUT_MS = 3_000;
 
     private CalendarAlarmScheduler() {
     }
@@ -115,6 +118,25 @@ public class CalendarAlarmScheduler {
     }
 
     /**
+     * Checks whether the snapserver's control port can be reached right now, used as a
+     * proxy for "connected to the home network" without needing SSID/location permissions.
+     */
+    public static boolean isSnapserverReachable(Context context) {
+        Settings settings = Settings.getInstance(context);
+        String host = settings.getHost();
+        if (host.isEmpty())
+            return false;
+
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host, settings.getControlPort()), SNAPSERVER_REACHABLE_TIMEOUT_MS);
+            return true;
+        } catch (IOException e) {
+            Log.d(TAG, "isSnapserverReachable: " + host + " unreachable", e);
+            return false;
+        }
+    }
+
+    /**
      * Returns the upcoming notification with the earliest play_datetime, or null if
      * the stored feed has no entries left in the future.
      */
@@ -160,6 +182,16 @@ public class CalendarAlarmScheduler {
             Log.w(TAG, "scheduleNext: exact alarm permission revoked", e);
         }
         return true;
+    }
+
+    /**
+     * Cancels the pending stop alarm for the currently playing occurrence (if any) without
+     * touching the next scheduled start, since scheduleNext already excludes occurrences
+     * whose play_datetime has passed.
+     */
+    public static void cancelStop(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(buildStopPendingIntent(context));
     }
 
     public static void scheduleStop(Context context) {

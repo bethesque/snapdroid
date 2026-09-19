@@ -93,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
         Button btnRefreshNotifications = findViewById(R.id.btnRefreshNotifications);
         btnRefreshNotifications.setOnClickListener(v -> refreshCalendarNotifications());
 
+        Button btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
+        btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
+
         askNotificationPermission();
     }
 
@@ -161,6 +164,12 @@ public class MainActivity extends AppCompatActivity {
                             : R.string.calendar_notifications_none_upcoming));
                 },
                 e -> showWarning(getString(R.string.calendar_notifications_fetch_failed, e.getMessage())));
+    }
+
+    private void stopPhoneAlarm() {
+        BroadcastReceiver.startService(this, SnapclientService.ACTION_STOP);
+        CalendarAlarmScheduler.cancelStop(this);
+        showWarning(getString(R.string.phone_alarm_stopped));
     }
 
     private void updateNextNotification() {
