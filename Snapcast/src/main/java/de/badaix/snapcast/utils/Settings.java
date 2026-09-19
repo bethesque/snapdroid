@@ -119,20 +119,12 @@ public class Settings {
         return getInt("controlPort", getStreamPort() + 1);
     }
 
-    public boolean isAutostart() {
-        return getBoolean("autoStart", false);
-    }
-
     public String getAudioEngine() {
         return "Auto"; // getString("audioEngine", "Auto");
     }
 
     public boolean doResample() {
         return true; // getBoolean("resample", true);
-    }
-
-    public void setAutostart(boolean autoStart) {
-        put("autoStart", autoStart);
     }
 
     public void setAudioEngine(String engine, boolean resample) {

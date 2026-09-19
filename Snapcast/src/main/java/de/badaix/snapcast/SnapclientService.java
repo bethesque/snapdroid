@@ -134,7 +134,7 @@ public class SnapclientService extends Service {
                             .setStyle(new NotificationCompat.BigTextStyle().bigText(getText(R.string.notification_text)))
                             .addAction(R.drawable.ic_media_stop, getString(R.string.stop), piStop);
 
-            Intent resultIntent = new Intent(this, MainActivity.class);
+            Intent resultIntent = new Intent(this, SnapclientActivity.class);
 
             // The stack builder object will contain an artificial back stack for the
             // started Activity.
@@ -142,7 +142,7 @@ public class SnapclientService extends Service {
             // your application to the Home screen.
             TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
             // Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(MainActivity.class);
+            stackBuilder.addParentStack(SnapclientActivity.class);
             // Adds the Intent that starts the Activity to the top of the stack
             stackBuilder.addNextIntent(resultIntent);
             PendingIntent resultPendingIntent =

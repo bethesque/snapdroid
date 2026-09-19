@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="de.badaix.snapcast.MainActivity">
+    <item
+        android:id="@+id/action_settings"
+        android:icon="@drawable/settings_24px"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_snapclient"
+        android:orderInCategory="100"
+        android:title="@string/action_snapclient"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_refresh_notifications"
+        android:orderInCategory="100"
+        android:title="@string/action_refresh_notifications"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/action_about"
+        android:orderInCategory="100"
+        android:title="@string/action_about"
+        app:showAsAction="never" />
+</menu>

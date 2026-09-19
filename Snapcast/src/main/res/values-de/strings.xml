@@ -48,7 +48,6 @@
     <string name="audio_engine">Audio engine</string>
     <string name="resample_audio">Resample audio stream</string>
     <string name="settings">Einstellungen</string>
-    <string name="auto_start">Auto-start Snapclient</string>
     <string name="connect">Verbinden</string>
 </resources>
 

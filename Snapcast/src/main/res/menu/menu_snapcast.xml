@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="de.badaix.snapcast.SnapcastActivity">
+    tools:context="de.badaix.snapcast.SnapclientActivity">
     <item
         android:id="@+id/action_play_stop"
         android:icon="@android:drawable/ic_media_play"
@@ -9,31 +9,9 @@
         android:title="@string/action_play_stop"
         android:visible="false"
         app:showAsAction="always" />
-    <!--    <item
-            android:id="@+id/action_settings"
-            android:orderInCategory="100"
-            android:title="@string/action_settings"
-            app:showAsAction="never" /> -->
-
-    <item
-        android:id="@+id/action_about"
-        android:orderInCategory="100"
-        android:title="@string/action_about"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_settings"
-        android:icon="@drawable/settings_24px"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="always" />
     <item
         android:id="@+id/action_refresh"
         android:orderInCategory="100"
         android:title="@string/action_refresh"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/action_refresh_notifications"
-        android:orderInCategory="100"
-        android:title="@string/action_refresh_notifications"
         app:showAsAction="never" />
 </menu>

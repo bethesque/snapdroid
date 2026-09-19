@@ -33,12 +33,8 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()) {
-            // Auto start snapclient on boot
+            // Re-arm the next calendar alarm notification from persisted data on boot.
             case "android.intent.action.BOOT_COMPLETED":
-                if (Settings.getInstance(context).isAutostart()) {
-                    startService(context, SnapclientService.ACTION_START);
-                }
-                // Re-arm the next calendar alarm notification from persisted data.
                 CalendarAlarmScheduler.scheduleNext(context);
                 break;
 
