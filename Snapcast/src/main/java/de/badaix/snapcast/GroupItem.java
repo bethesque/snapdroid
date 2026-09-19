@@ -99,8 +99,9 @@ public class GroupItem extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 //        title.setText(group.getName());
         llClient.removeAllViews();
         clientItems.clear();
+        String ownClientId = SnapclientService.getUniqueId(getContext());
         for (Client client : group.getClients()) {
-            if ((client == null) || client.isDeleted() || (hideOffline && !client.isConnected()))
+            if ((client == null) || client.isDeleted() || (hideOffline && !client.isConnected()) || !ownClientId.equals(client.getId()))
                 continue;
 
             ClientItem clientItem = new ClientItem(this.getContext(), client);

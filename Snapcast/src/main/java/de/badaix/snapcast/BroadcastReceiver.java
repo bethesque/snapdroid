@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
+import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 import de.badaix.snapcast.utils.Settings;
 
 /**
@@ -37,6 +38,8 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
                 if (Settings.getInstance(context).isAutostart()) {
                     startService(context, SnapclientService.ACTION_START);
                 }
+                // Re-arm the next calendar alarm notification from persisted data.
+                CalendarAlarmScheduler.scheduleNext(context);
                 break;
 
             // Control snapclient service via broadcast intents
@@ -49,7 +52,7 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
         }
     }
 
-    private void startService(Context context, String action) {
+    static void startService(Context context, String action) {
         Intent i = new Intent(context, SnapclientService.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         i.setAction(action);

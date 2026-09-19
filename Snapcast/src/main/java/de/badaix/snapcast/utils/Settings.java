@@ -145,4 +145,20 @@ public class Settings {
         put("streamPort", streamPort);
         put("controlPort", controlPort);
     }
+
+    public String getCalendarAlarmsUrl() {
+        return getString("calendarAlarmsUrl", "");
+    }
+
+    public void setCalendarAlarmsUrl(String calendarAlarmsUrl) {
+        put("calendarAlarmsUrl", calendarAlarmsUrl);
+    }
+
+    public String getCalendarNotificationsJson() {
+        return getString("calendarNotificationsJson", "");
+    }
+
+    public void setCalendarNotificationsJson(String calendarNotificationsJson) {
+        put("calendarNotificationsJson", calendarNotificationsJson);
+    }
 }

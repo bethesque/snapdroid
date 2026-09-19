@@ -19,6 +19,7 @@
 package de.badaix.snapcast;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.net.Uri;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +45,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -56,6 +59,7 @@ import org.json.JSONObject;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 
+import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 import de.badaix.snapcast.control.RemoteControl;
 import de.badaix.snapcast.control.json.Client;
 import de.badaix.snapcast.control.json.Group;
@@ -238,6 +242,9 @@ public class MainActivity extends AppCompatActivity implements GroupItem.GroupIt
                 startRemoteControl();
             }
             remoteControl.getServerStatus();
+        } else if (id == R.id.action_refresh_notifications) {
+            refreshCalendarNotifications();
+            return true;
         } else if (id == R.id.action_about) {
             Intent intent = new Intent(this, AboutActivity.class);
             startActivity(intent);
@@ -297,6 +304,40 @@ public class MainActivity extends AppCompatActivity implements GroupItem.GroupIt
         if ((remoteControl != null) && (remoteControl.isConnected()))
             remoteControl.disconnect();
         remoteControl = null;
+    }
+
+    private void refreshCalendarNotifications() {
+        if (Settings.getInstance(this).getCalendarAlarmsUrl().trim().isEmpty()) {
+            showWarning(getString(R.string.calendar_alarms_url_empty));
+            return;
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (!alarmManager.canScheduleExactAlarms()) {
+                new AlertDialog.Builder(this)
+                        .setTitle(R.string.exact_alarm_permission_title)
+                        .setMessage(R.string.exact_alarm_permission_message)
+                        .setPositiveButton(R.string.open_settings, (dialog, which) -> {
+                            Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                    Uri.parse("package:" + getPackageName()));
+                            startActivity(intent);
+                        })
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show();
+                return;
+            }
+        }
+
+        CalendarAlarmScheduler.fetchAndStore(this,
+                () -> {
+                    boolean hasUpcoming = CalendarAlarmScheduler.scheduleNext(this);
+                    groupListFragment.updateNextNotification();
+                    showWarning(getString(hasUpcoming
+                            ? R.string.calendar_notifications_refreshed
+                            : R.string.calendar_notifications_none_upcoming));
+                },
+                e -> showWarning(getString(R.string.calendar_notifications_fetch_failed, e.getMessage())));
     }
 
 

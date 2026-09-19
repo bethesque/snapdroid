@@ -49,6 +49,7 @@ public class ServerDialogFragment extends DialogFragment implements View.OnClick
     private EditText editHost;
     private EditText editStreamPort;
     private EditText editControlPort;
+    private EditText editCalendarAlarmsUrl;
     private CheckBox checkBoxAutoStart;
     private CheckBox checkBoxResample;
     private Spinner spinnerAudioEngine;
@@ -77,6 +78,7 @@ public class ServerDialogFragment extends DialogFragment implements View.OnClick
         editHost = view.findViewById(R.id.host);
         editStreamPort = view.findViewById(R.id.stream_port);
         editControlPort = view.findViewById(R.id.control_port);
+        editCalendarAlarmsUrl = view.findViewById(R.id.calendar_alarms_url);
         checkBoxAutoStart = view.findViewById(R.id.checkBoxAutoStart);
 
         spinnerAudioEngine = view.findViewById(R.id.audio_engine);
@@ -106,6 +108,7 @@ public class ServerDialogFragment extends DialogFragment implements View.OnClick
                             listener.onAutoStartChanged(checkBoxAutoStart.isChecked());
                         }
                         Settings.getInstance(getContext()).setAudioEngine(spinnerAudioEngine.getSelectedItem().toString(), checkBoxResample.isChecked());
+                        Settings.getInstance(getContext()).setCalendarAlarmsUrl(editCalendarAlarmsUrl.getText().toString());
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
@@ -160,6 +163,7 @@ public class ServerDialogFragment extends DialogFragment implements View.OnClick
                             }
                         }
                         checkBoxResample.setChecked(Settings.getInstance(getContext()).doResample());
+                        editCalendarAlarmsUrl.setText(Settings.getInstance(getContext()).getCalendarAlarmsUrl());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

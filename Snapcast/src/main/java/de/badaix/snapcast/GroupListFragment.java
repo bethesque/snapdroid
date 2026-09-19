@@ -26,12 +26,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
+import de.badaix.snapcast.calendar.CalendarNotification;
 import de.badaix.snapcast.control.json.Client;
 import de.badaix.snapcast.control.json.Group;
 import de.badaix.snapcast.control.json.ServerStatus;
@@ -46,11 +52,13 @@ import de.badaix.snapcast.control.json.ServerStatus;
 public class GroupListFragment extends Fragment {
 
     private static final String TAG = "GroupList";
+    private static final DateTimeFormatter NEXT_NOTIFICATION_FORMATTER = DateTimeFormatter.ofPattern("EEE d MMM, HH:mm", Locale.getDefault());
 
     private GroupItem.GroupItemListener groupItemListener;
     private GroupAdapter groupAdapter;
     private ServerStatus serverStatus = null;
     private boolean hideOffline = false;
+    private TextView tvNextNotification;
 
     public GroupListFragment() {
         // Required empty public constructor
@@ -72,11 +80,13 @@ public class GroupListFragment extends Fragment {
         Log.d(TAG, "onCreateView: " + this);
         View view = inflater.inflate(R.layout.fragment_group_list, container, false);
         ListView lvGroup = view.findViewById(R.id.lvGroup);
+        tvNextNotification = view.findViewById(R.id.tvNextNotification);
         groupAdapter = new GroupAdapter(getContext(), groupItemListener);
         groupAdapter.setHideOffline(hideOffline);
         groupAdapter.updateServer(serverStatus);
         lvGroup.setAdapter(groupAdapter);
         updateGui();
+        updateNextNotification();
         return view;
     }
 
@@ -106,6 +116,25 @@ public class GroupListFragment extends Fragment {
         this.serverStatus = serverStatus;
         if (groupAdapter != null)
             groupAdapter.updateServer(serverStatus);
+        updateNextNotification();
+    }
+
+    public void updateNextNotification() {
+        FragmentActivity activity = getActivity();
+        if ((activity == null) || (tvNextNotification == null))
+            return;
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (tvNextNotification == null)
+                    return;
+                CalendarNotification next = CalendarAlarmScheduler.getNext(activity);
+                if (next == null)
+                    tvNextNotification.setText(R.string.no_upcoming_notification);
+                else
+                    tvNextNotification.setText(activity.getString(R.string.next_notification, next.getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER)));
+            }
+        });
     }
 
     public void setHideOffline(boolean hide) {
@@ -157,6 +186,7 @@ public class GroupListFragment extends Fragment {
             FragmentActivity activity = getActivity();
             if (activity == null)
                 return;
+            final String ownClientId = SnapclientService.getUniqueId(context);
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -165,17 +195,15 @@ public class GroupListFragment extends Fragment {
                         if (group.getClients().isEmpty())
                             continue;
 
-                        int onlineCount = 0;
-                        int count = 0;
+                        Client ownClient = null;
                         for (Client client : group.getClients()) {
-                            if (client == null || client.isDeleted())
+                            if ((client == null) || client.isDeleted() || !ownClientId.equals(client.getId()))
                                 continue;
-                            if (client.isConnected())// && client.getConfig().getStream().equals(GroupListFragment.this.stream.getId()))
-                                onlineCount++;
-                            count++;
+                            ownClient = client;
+                            break;
                         }
 
-                        if ((onlineCount > 0) || (!hideOffline && (count > 0)))
+                        if ((ownClient != null) && (ownClient.isConnected() || !hideOffline))
                             add(group);
                     }
 
