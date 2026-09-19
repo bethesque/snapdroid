@@ -1,0 +1,25 @@
+diff --git a/client/player/oboe_player.cpp b/client/player/oboe_player.cpp
+index 24e0f898..3d68dcbc 100644
+--- a/client/player/oboe_player.cpp
++++ b/client/player/oboe_player.cpp
+@@ -104,6 +104,7 @@ oboe::Result OboePlayer::openStream()
+                       ->setChannelCount(stream_->getFormat().channels())
+                       ->setSampleRate(stream_->getFormat().rate())
+                       ->setFormat(audio_format)
++                      ->setUsage(oboe::Usage::Notification)
+                       ->setDataCallback(this)
+                       ->setErrorCallback(this)
+                       ->setDirection(oboe::Direction::Output)
+diff --git a/client/player/opensl_player.cpp b/client/player/opensl_player.cpp
+index 1642967e..f4b95a9b 100644
+--- a/client/player/opensl_player.cpp
++++ b/client/player/opensl_player.cpp
+@@ -283,7 +283,7 @@ void OpenslPlayer::initOpensl()
+     SLAndroidConfigurationItf playerConfig;
+     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDCONFIGURATION, &playerConfig);
+     throwUnsuccess(kPhaseInit, "PlayerObject::GetInterface", result);
+-    SLint32 streamType = SL_ANDROID_STREAM_MEDIA;
++    SLint32 streamType = SL_ANDROID_STREAM_NOTIFICATION;
+     ////	SLint32 streamType = SL_ANDROID_STREAM_VOICE;
+     result = (*playerConfig)->SetConfiguration(playerConfig, SL_ANDROID_KEY_STREAM_TYPE, &streamType, sizeof(SLint32));
+     throwUnsuccess(kPhaseInit, "PlayerConfig::SetConfiguration", result);

@@ -50,6 +50,36 @@ android {
     }
 }
 
+tasks.register('applySnapcastPatches') {
+    doLast {
+        def submoduleDir = file('src/main/cpp/snapcast')
+        def patchDir = file('patches')
+        patchDir.listFiles().findAll { it.name.endsWith('.patch') }.sort { it.name }.each { patch ->
+            def alreadyApplied = new ByteArrayOutputStream().withStream { err ->
+                exec {
+                    commandLine 'git', '-C', submoduleDir, 'apply', '--reverse', '--check', patch
+                    ignoreExitValue = true
+                    errorOutput = err
+                }.exitValue == 0
+            }
+            if (alreadyApplied) {
+                logger.info("Snapcast patch already applied: ${patch.name}")
+            } else {
+                exec {
+                    commandLine 'git', '-C', submoduleDir, 'apply', patch
+                }
+                logger.lifecycle("Applied Snapcast patch: ${patch.name}")
+            }
+        }
+    }
+}
+
+tasks.whenTaskAdded { task ->
+    if (task.name.startsWith('externalNativeBuild') || task.name.startsWith('configureCmake') || task.name.startsWith('buildCMake')) {
+        task.dependsOn applySnapcastPatches
+    }
+}
+
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
