@@ -17,8 +17,11 @@
     <string name="action_scan">Scan for server</string>
     <string name="action_refresh">Refresh client list</string>
     <string name="action_refresh_notifications">Refresh notifications</string>
-    <string name="action_stop_phone_alarm">Stop phone alarm</string>
+    <string name="action_stop_phone_alarm">Stop alarm on phone</string>
     <string name="phone_alarm_stopped">Phone alarm stopped</string>
+    <string name="action_stop_alarm_for_all">Stop alarm for all</string>
+    <string name="alarm_stopped_for_all">Alarm stopped for all</string>
+    <string name="stop_alarm_for_all_failed">Failed to stop alarm: %1$s</string>
     <string name="action_save">Save</string>
     <string name="action_bar_failed">Cannot set ActionBar!</string>
 

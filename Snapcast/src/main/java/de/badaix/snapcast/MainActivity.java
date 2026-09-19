@@ -96,6 +96,9 @@ public class MainActivity extends AppCompatActivity {
         Button btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
         btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
 
+        Button btnStopAlarmForAll = findViewById(R.id.btnStopAlarmForAll);
+        btnStopAlarmForAll.setOnClickListener(v -> stopAlarmForAll());
+
         askNotificationPermission();
     }
 
@@ -170,6 +173,17 @@ public class MainActivity extends AppCompatActivity {
         BroadcastReceiver.startService(this, SnapclientService.ACTION_STOP);
         CalendarAlarmScheduler.cancelStop(this);
         showWarning(getString(R.string.phone_alarm_stopped));
+    }
+
+    private void stopAlarmForAll() {
+        if (Settings.getInstance(this).getCalendarAlarmsUrl().trim().isEmpty()) {
+            showWarning(getString(R.string.calendar_alarms_url_empty));
+            return;
+        }
+
+        CalendarAlarmScheduler.stopOnServer(this,
+                () -> showWarning(getString(R.string.alarm_stopped_for_all)),
+                e -> showWarning(getString(R.string.stop_alarm_for_all_failed, e.getMessage())));
     }
 
     private void updateNextNotification() {

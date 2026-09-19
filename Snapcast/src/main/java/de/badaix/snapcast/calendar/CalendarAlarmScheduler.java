@@ -46,6 +46,7 @@ public class CalendarAlarmScheduler {
     private static final int CONNECT_TIMEOUT_MS = 10_000;
     private static final int READ_TIMEOUT_MS = 15_000;
     private static final String NOTIFICATIONS_PATH = "/alarm/notifications";
+    private static final String STOP_ALARM_PATH = "/alarm/stop";
     private static final int SNAPSERVER_REACHABLE_TIMEOUT_MS = 3_000;
 
     private CalendarAlarmScheduler() {
@@ -67,6 +68,41 @@ public class CalendarAlarmScheduler {
                 mainHandler.post(() -> onError.accept(e));
             }
         }).start();
+    }
+
+    /**
+     * Posts to the Calendar Alarms URL's /alarm/stop endpoint, telling the server to stop
+     * the alarm for all listening clients (as opposed to just this phone).
+     */
+    public static void stopOnServer(Context context, Runnable onSuccess, Consumer<Exception> onError) {
+        Context appContext = context.getApplicationContext();
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        new Thread(() -> {
+            try {
+                String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
+                post(baseUrl.replaceAll("/+$", "") + STOP_ALARM_PATH);
+                mainHandler.post(onSuccess);
+            } catch (Exception e) {
+                Log.e(TAG, "stopOnServer failed", e);
+                mainHandler.post(() -> onError.accept(e));
+            }
+        }).start();
+    }
+
+    private static void post(String urlString) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
+        try {
+            connection.setRequestMethod("POST");
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            connection.setReadTimeout(READ_TIMEOUT_MS);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new IOException("Unexpected HTTP response code: " + responseCode);
+            }
+        } finally {
+            connection.disconnect();
+        }
     }
 
     private static String fetch(String urlString) throws IOException {
