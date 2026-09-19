@@ -189,6 +189,25 @@ public class CalendarAlarmScheduler {
     }
 
     /**
+     * Returns every stored notification that shares the earliest upcoming play_datetime
+     * (i.e. all events due to play next, since more than one calendar event can share the
+     * same play time), or an empty list if there's nothing upcoming.
+     */
+    public static List<CalendarNotification> getNextGroup(Context context) {
+        List<CalendarNotification> group = new ArrayList<>();
+        CalendarNotification next = getNext(context);
+        if (next == null)
+            return group;
+
+        Instant nextInstant = next.getPlayDateTime().toInstant();
+        for (CalendarNotification notification : loadStored(context)) {
+            if (notification.getPlayDateTime().toInstant().equals(nextInstant))
+                group.add(notification);
+        }
+        return group;
+    }
+
+    /**
      * Cancels any pending start alarm and re-arms it for the earliest upcoming
      * play_datetime in the stored feed. Returns true if an upcoming notification
      * was found (regardless of whether the OS alarm could actually be scheduled).

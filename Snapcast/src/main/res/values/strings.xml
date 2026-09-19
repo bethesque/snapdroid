@@ -66,7 +66,7 @@
     <string name="calendar_notifications_fetch_failed">Failed to refresh notifications: %1$s</string>
     <string name="calendar_notifications_refreshed">Notifications refreshed</string>
     <string name="calendar_notifications_none_upcoming">No upcoming notifications found</string>
-    <string name="next_notification">Next: %1$s</string>
+    <string name="next_notification">Next: %1$s\n%2$s</string>
     <string name="no_upcoming_notification">No upcoming notifications</string>
     <string name="exact_alarm_permission_title">Allow exact alarms</string>
     <string name="exact_alarm_permission_message">Snapdroid needs the \"Alarms &amp; reminders\" permission to start playback on time. Please enable it for Snapdroid in system settings.</string>

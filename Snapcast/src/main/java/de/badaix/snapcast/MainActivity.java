@@ -43,7 +43,12 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 import de.badaix.snapcast.calendar.CalendarNotification;
@@ -51,7 +56,10 @@ import de.badaix.snapcast.utils.Settings;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final DateTimeFormatter NEXT_NOTIFICATION_FORMATTER = DateTimeFormatter.ofPattern("EEE d MMM, HH:mm", Locale.getDefault());
+    private static final DateTimeFormatter NEXT_NOTIFICATION_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("EEE d MMM, h:mm")
+            .appendText(ChronoField.AMPM_OF_DAY, Map.of(0L, "am", 1L, "pm"))
+            .toFormatter(Locale.getDefault());
 
     private CoordinatorLayout coordinatorLayout;
     private TextView tvNextNotification;
@@ -187,11 +195,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateNextNotification() {
-        CalendarNotification next = CalendarAlarmScheduler.getNext(this);
-        if (next == null)
+        List<CalendarNotification> nextGroup = CalendarAlarmScheduler.getNextGroup(this);
+        if (nextGroup.isEmpty()) {
             tvNextNotification.setText(R.string.no_upcoming_notification);
-        else
-            tvNextNotification.setText(getString(R.string.next_notification, next.getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER)));
+        } else {
+            String summaries = nextGroup.stream()
+                    .map(CalendarNotification::getSummary)
+                    .collect(Collectors.joining(", "));
+            String when = nextGroup.get(0).getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER);
+            tvNextNotification.setText(getString(R.string.next_notification, summaries, when));
+        }
     }
 
     private void showWarning(String msg) {
