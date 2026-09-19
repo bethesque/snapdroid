@@ -5,5 +5,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="statusBarBackground">?attr/colorPrimaryDark</item>
+        <!-- Only MainActivity handles window insets; opt the rest of the app out of the
+             edge-to-edge enforcement Android 15 (API 35) applies by default, which otherwise
+             draws content (e.g. ClientSettingsActivity, GroupSettingsActivity, AboutActivity)
+             underneath the status bar. -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
     </style>
 </resources>
