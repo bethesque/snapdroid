@@ -57,7 +57,6 @@ public class GroupListFragment extends Fragment {
     private GroupItem.GroupItemListener groupItemListener;
     private GroupAdapter groupAdapter;
     private ServerStatus serverStatus = null;
-    private boolean hideOffline = false;
     private TextView tvNextNotification;
 
     public GroupListFragment() {
@@ -82,7 +81,6 @@ public class GroupListFragment extends Fragment {
         ListView lvGroup = view.findViewById(R.id.lvGroup);
         tvNextNotification = view.findViewById(R.id.tvNextNotification);
         groupAdapter = new GroupAdapter(getContext(), groupItemListener);
-        groupAdapter.setHideOffline(hideOffline);
         groupAdapter.updateServer(serverStatus);
         lvGroup.setAdapter(groupAdapter);
         updateGui();
@@ -137,16 +135,9 @@ public class GroupListFragment extends Fragment {
         });
     }
 
-    public void setHideOffline(boolean hide) {
-        this.hideOffline = hide;
-        if (groupAdapter != null)
-            groupAdapter.setHideOffline(hideOffline);
-    }
-
     public class GroupAdapter extends ArrayAdapter<Group> {
         private final Context context;
         private final GroupItem.GroupItemListener listener;
-        private boolean hideOffline = false;
         private ServerStatus serverStatus = new ServerStatus();
 
         GroupAdapter(Context context, GroupItem.GroupItemListener listener) {
@@ -169,7 +160,6 @@ public class GroupListFragment extends Fragment {
             } else {
                 groupItem = new GroupItem(context, serverStatus, group);
             }
-            groupItem.setHideOffline(hideOffline);
             groupItem.setListener(listener);
             return groupItem;
         }
@@ -203,7 +193,7 @@ public class GroupListFragment extends Fragment {
                             break;
                         }
 
-                        if ((ownClient != null) && (ownClient.isConnected() || !hideOffline))
+                        if (ownClient != null)
                             add(group);
                     }
 
@@ -211,13 +201,6 @@ public class GroupListFragment extends Fragment {
                         notifyDataSetChanged();
                 }
             });
-        }
-
-        void setHideOffline(boolean hideOffline) {
-            if (this.hideOffline == hideOffline)
-                return;
-            this.hideOffline = hideOffline;
-            update();
         }
     }
 

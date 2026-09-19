@@ -170,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements GroupItem.GroupIt
         // primary sections of the activity.
 
         groupListFragment = (GroupListFragment) getSupportFragmentManager().findFragmentById(R.id.groupListFragment);
-        groupListFragment.setHideOffline(Settings.getInstance(this).getBoolean("hide_offline", false));
 
         setActionbarSubtitle("Host: no Snapserver found");
         serverStatus = new ServerStatus();
@@ -185,9 +184,6 @@ public class MainActivity extends AppCompatActivity implements GroupItem.GroupIt
         miSettings = menu.findItem(R.id.action_settings);
 //        miRefresh = menu.findItem(R.id.action_refresh);
         updateStartStopMenuItem();
-        boolean isChecked = Settings.getInstance(this).getBoolean("hide_offline", false);
-        MenuItem menuItem = menu.findItem(R.id.action_hide_offline);
-        menuItem.setChecked(isChecked);
 //        setHost(host, port, controlPort);
         if (remoteControl != null) {
             updateMenuItems(remoteControl.isConnected());
@@ -229,11 +225,6 @@ public class MainActivity extends AppCompatActivity implements GroupItem.GroupIt
                 item.setEnabled(false);
                 startSnapclient();
             }
-            return true;
-        } else if (id == R.id.action_hide_offline) {
-            item.setChecked(!item.isChecked());
-            Settings.getInstance(this).put("hide_offline", item.isChecked());
-            groupListFragment.setHideOffline(item.isChecked());
             return true;
         } else if (id == R.id.action_refresh) {
             if (host.trim().isEmpty()) {

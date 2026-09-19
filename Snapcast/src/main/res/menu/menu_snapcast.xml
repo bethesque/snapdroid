@@ -36,10 +36,4 @@
         android:orderInCategory="100"
         android:title="@string/action_refresh_notifications"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_hide_offline"
-        android:checkable="true"
-        android:orderInCategory="100"
-        android:title="@string/action_hide_offline"
-        app:showAsAction="never" />
 </menu>

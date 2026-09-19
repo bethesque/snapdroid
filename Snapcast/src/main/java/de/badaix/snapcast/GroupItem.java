@@ -58,7 +58,6 @@ public class GroupItem extends LinearLayout implements SeekBar.OnSeekBarChangeLi
     private TextView tvStreamName = null;
     private GroupItemListener listener = null;
     private final LinearLayout llVolume;
-    private boolean hideOffline = false;
     private Vector<ClientItem> clientItems = null;
     private Vector<Integer> clientVolumes = null;
     private int groupVolume = 0;
@@ -101,7 +100,7 @@ public class GroupItem extends LinearLayout implements SeekBar.OnSeekBarChangeLi
         clientItems.clear();
         String ownClientId = SnapclientService.getUniqueId(getContext());
         for (Client client : group.getClients()) {
-            if ((client == null) || client.isDeleted() || (hideOffline && !client.isConnected()) || !ownClientId.equals(client.getId()))
+            if ((client == null) || client.isDeleted() || !ownClientId.equals(client.getId()))
                 continue;
 
             ClientItem clientItem = new ClientItem(this.getContext(), client);
@@ -159,13 +158,6 @@ public class GroupItem extends LinearLayout implements SeekBar.OnSeekBarChangeLi
 
     public void setListener(GroupItemListener listener) {
         this.listener = listener;
-    }
-
-    public void setHideOffline(boolean hideOffline) {
-        if (this.hideOffline == hideOffline)
-            return;
-        this.hideOffline = hideOffline;
-        update();
     }
 
     @Override
