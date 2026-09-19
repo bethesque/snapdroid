@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Snapcast</string>
+    <string name="app_name">Snapcast Dev</string>
     <string name="ticker_text">Snapclient started</string>
     <string name="notification_title">Snapclient</string>
     <string name="notification_text">Snapclient is running…</string>
