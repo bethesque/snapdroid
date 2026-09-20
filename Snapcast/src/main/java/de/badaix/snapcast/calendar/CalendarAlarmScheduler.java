@@ -42,7 +42,7 @@ import de.badaix.snapcast.utils.Settings;
 /**
  * Fetches and persists the "Calendar Alarms URL" feed, and drives the AlarmManager
  * schedule that starts the Snapclient 45 seconds before each upcoming play_datetime,
- * lets it run for 5 minutes, then stops it and arms the next one.
+ * lets it run for that occurrence's duration_seconds, then stops it and arms the next one.
  */
 public class CalendarAlarmScheduler {
     private static final String TAG = "CalendarAlarmScheduler";
@@ -50,7 +50,6 @@ public class CalendarAlarmScheduler {
     private static final int REQUEST_CODE_ALARM_START = 2001;
     private static final int REQUEST_CODE_ALARM_STOP = 2002;
     private static final long LEAD_TIME_MS = 45_000L;
-    private static final long PLAY_DURATION_MS = 5 * 60_000L;
     private static final int CONNECT_TIMEOUT_MS = 10_000;
     private static final int READ_TIMEOUT_MS = 15_000;
     private static final String NOTIFICATIONS_PATH = "/alarm/notifications";
@@ -256,6 +255,19 @@ public class CalendarAlarmScheduler {
     }
 
     /**
+     * Returns how long the Snapclient should keep playing for the upcoming occurrence(s),
+     * i.e. the longest duration_seconds among every notification sharing the next
+     * play_datetime, or 0 if there's nothing upcoming.
+     */
+    public static long getNextPlayDurationMillis(Context context) {
+        long maxDurationSeconds = 0;
+        for (CalendarNotification notification : getNextGroup(context)) {
+            maxDurationSeconds = Math.max(maxDurationSeconds, notification.getDurationSeconds());
+        }
+        return maxDurationSeconds * 1000L;
+    }
+
+    /**
      * Cancels any pending start alarm and re-arms it for the earliest upcoming
      * play_datetime in the stored feed. Returns true if an upcoming notification
      * was found (regardless of whether the OS alarm could actually be scheduled).
@@ -297,10 +309,10 @@ public class CalendarAlarmScheduler {
         alarmManager.cancel(buildStopPendingIntent(context));
     }
 
-    public static void scheduleStop(Context context) {
+    public static void scheduleStop(Context context, long durationMillis) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent stopPendingIntent = buildStopPendingIntent(context);
-        long triggerAtMillis = SystemClock.elapsedRealtime() + PLAY_DURATION_MS;
+        long triggerAtMillis = SystemClock.elapsedRealtime() + durationMillis;
         try {
             setExactAlarm(alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtMillis, stopPendingIntent);
         } catch (SecurityException e) {

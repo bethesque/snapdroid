@@ -8,8 +8,8 @@ import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 
 /**
  * Fires from AlarmManager 45 seconds before an upcoming calendar notification's
- * play_datetime (ACTION_ALARM_START) and again 5 minutes later (ACTION_ALARM_STOP),
- * driving Snapclient start/stop and re-arming the next alarm.
+ * play_datetime (ACTION_ALARM_START) and again after that occurrence's duration_seconds
+ * has elapsed (ACTION_ALARM_STOP), driving Snapclient start/stop and re-arming the next alarm.
  */
 public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
     private static final String TAG = "CalendarAlarmReceiver";
@@ -26,7 +26,7 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
                 try {
                     if (CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
                         BroadcastReceiver.startService(appContext, SnapclientService.ACTION_START);
-                        CalendarAlarmScheduler.scheduleStop(appContext);
+                        CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
                     } else {
                         Log.d(TAG, "onReceive: snapserver unreachable (not on home network?), skipping this occurrence");
                         CalendarAlarmScheduler.scheduleNext(appContext);
