@@ -130,7 +130,7 @@ public class GroupListFragment extends Fragment {
                 if (next == null)
                     tvNextNotification.setText(R.string.no_upcoming_notification);
                 else
-                    tvNextNotification.setText(activity.getString(R.string.next_notification, next.getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER)));
+                    tvNextNotification.setText(activity.getString(R.string.next_notification, next.getSummary(), next.getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER)));
             }
         });
     }
