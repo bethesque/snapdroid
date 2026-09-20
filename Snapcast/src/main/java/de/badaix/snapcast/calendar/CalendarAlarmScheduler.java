@@ -41,7 +41,7 @@ import de.badaix.snapcast.utils.Settings;
 
 /**
  * Fetches and persists the "Calendar Alarms URL" feed, and drives the AlarmManager
- * schedule that starts the Snapclient 15 seconds before each upcoming play_datetime,
+ * schedule that starts the Snapclient 45 seconds before each upcoming play_datetime,
  * lets it run for 5 minutes, then stops it and arms the next one.
  */
 public class CalendarAlarmScheduler {
@@ -49,7 +49,7 @@ public class CalendarAlarmScheduler {
 
     private static final int REQUEST_CODE_ALARM_START = 2001;
     private static final int REQUEST_CODE_ALARM_STOP = 2002;
-    private static final long LEAD_TIME_MS = 15_000L;
+    private static final long LEAD_TIME_MS = 45_000L;
     private static final long PLAY_DURATION_MS = 5 * 60_000L;
     private static final int CONNECT_TIMEOUT_MS = 10_000;
     private static final int READ_TIMEOUT_MS = 15_000;

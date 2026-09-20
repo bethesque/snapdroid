@@ -7,7 +7,7 @@ import android.util.Log;
 import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 
 /**
- * Fires from AlarmManager 15 seconds before an upcoming calendar notification's
+ * Fires from AlarmManager 45 seconds before an upcoming calendar notification's
  * play_datetime (ACTION_ALARM_START) and again 5 minutes later (ACTION_ALARM_STOP),
  * driving Snapclient start/stop and re-arming the next alarm.
  */
@@ -37,7 +37,21 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
             }).start();
         } else if (ACTION_ALARM_STOP.equals(action)) {
             BroadcastReceiver.startService(context, SnapclientService.ACTION_STOP);
-            CalendarAlarmScheduler.scheduleNext(context);
+            android.content.BroadcastReceiver.PendingResult pendingResult = goAsync();
+            Context appContext = context.getApplicationContext();
+            new Thread(() -> {
+                try {
+                    // The alarm may have been snoozed since this occurrence was scheduled, so
+                    // refresh the feed before re-arming; fall back to the existing data if the
+                    // refresh fails rather than leaving the next alarm unscheduled.
+                    CalendarAlarmScheduler.fetchAndStoreSync(appContext);
+                } catch (Exception e) {
+                    Log.w(TAG, "onReceive: calendar refresh failed, using existing data", e);
+                } finally {
+                    CalendarAlarmScheduler.scheduleNext(appContext);
+                    pendingResult.finish();
+                }
+            }).start();
         }
     }
 }
