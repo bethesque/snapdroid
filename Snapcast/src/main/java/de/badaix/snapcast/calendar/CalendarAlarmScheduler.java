@@ -26,7 +26,15 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+
+import androidx.work.BackoffPolicy;
+import androidx.work.Constraints;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.NetworkType;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import de.badaix.snapcast.CalendarAlarmReceiver;
 import de.badaix.snapcast.utils.Settings;
@@ -48,6 +56,14 @@ public class CalendarAlarmScheduler {
     private static final String NOTIFICATIONS_PATH = "/alarm/notifications";
     private static final String STOP_ALARM_PATH = "/alarm/stop";
     private static final int SNAPSERVER_REACHABLE_TIMEOUT_MS = 3_000;
+    private static final String PERIODIC_REFRESH_WORK_NAME = "calendar_refresh";
+
+    /**
+     * WorkManager silently refuses to run PeriodicWorkRequests more often than this, so
+     * it's also the floor enforced when saving the setting in ServerSettingsActivity.
+     */
+    public static final int MIN_REFRESH_INTERVAL_MINUTES =
+            (int) TimeUnit.MILLISECONDS.toMinutes(PeriodicWorkRequest.MIN_PERIODIC_INTERVAL_MILLIS);
 
     private CalendarAlarmScheduler() {
     }
@@ -57,17 +73,49 @@ public class CalendarAlarmScheduler {
         Handler mainHandler = new Handler(Looper.getMainLooper());
         new Thread(() -> {
             try {
-                String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
-                String body = fetch(baseUrl.replaceAll("/+$", "") + NOTIFICATIONS_PATH);
-                // Sanity-parse before persisting so garbage never overwrites a working schedule.
-                new JSONObject(body);
-                Settings.getInstance(appContext).setCalendarNotificationsJson(body);
+                fetchAndStoreSync(appContext);
                 mainHandler.post(onSuccess);
             } catch (Exception e) {
                 Log.e(TAG, "fetchAndStore failed", e);
                 mainHandler.post(() -> onError.accept(e));
             }
         }).start();
+    }
+
+    /**
+     * Blocking fetch-and-persist, for callers (e.g. a WorkManager Worker) that already
+     * run on a background thread and want to handle the result/exception synchronously.
+     */
+    public static void fetchAndStoreSync(Context context) throws IOException, JSONException {
+        Context appContext = context.getApplicationContext();
+        String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
+        String body = fetch(baseUrl.replaceAll("/+$", "") + NOTIFICATIONS_PATH);
+        // Sanity-parse before persisting so garbage never overwrites a working schedule.
+        new JSONObject(body);
+        Settings.getInstance(appContext).setCalendarNotificationsJson(body);
+    }
+
+    /**
+     * (Re)schedules the periodic calendar feed refresh at the interval configured in
+     * Settings. Safe to call repeatedly (e.g. on every app start and whenever the
+     * interval setting changes) since WorkManager de-dupes on the unique work name.
+     */
+    public static void schedulePeriodicRefresh(Context context) {
+        Context appContext = context.getApplicationContext();
+        int intervalMinutes = Math.max(Settings.getInstance(appContext).getCalendarRefreshIntervalMinutes(), MIN_REFRESH_INTERVAL_MINUTES);
+
+        Constraints constraints = new Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build();
+
+        PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
+                CalendarRefreshWorker.class, intervalMinutes, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .setBackoffCriteria(BackoffPolicy.LINEAR, PeriodicWorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
+                .build();
+
+        WorkManager.getInstance(appContext).enqueueUniquePeriodicWork(
+                PERIODIC_REFRESH_WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request);
     }
 
     /**

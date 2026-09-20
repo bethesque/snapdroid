@@ -34,8 +34,12 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         switch (intent.getAction()) {
             // Re-arm the next calendar alarm notification from persisted data on boot.
+            // WorkManager re-schedules its own periodic work after reboot, but calling
+            // this here too is a harmless no-op safety net (enqueueUniquePeriodicWork
+            // with UPDATE just re-applies the currently configured interval).
             case "android.intent.action.BOOT_COMPLETED":
                 CalendarAlarmScheduler.scheduleNext(context);
+                CalendarAlarmScheduler.schedulePeriodicRefresh(context);
                 break;
 
             // Control snapclient service via broadcast intents

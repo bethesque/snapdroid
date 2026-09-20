@@ -179,6 +179,27 @@
                     android:hint="@string/calendar_alarms_url_hint"
                     android:inputType="textUri" />
             </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="3dip"
+                    android:text="@string/calendar_refresh_interval_minutes"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <EditText
+                    android:id="@+id/calendar_refresh_interval_minutes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp"
+                    android:ems="10"
+                    android:inputType="number"
+                    android:text="15" />
+            </TableRow>
         </TableLayout>
 
     </LinearLayout>

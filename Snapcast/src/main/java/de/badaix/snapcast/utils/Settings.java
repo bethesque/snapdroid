@@ -153,4 +153,12 @@ public class Settings {
     public void setCalendarNotificationsJson(String calendarNotificationsJson) {
         put("calendarNotificationsJson", calendarNotificationsJson);
     }
+
+    public int getCalendarRefreshIntervalMinutes() {
+        return getInt("calendarRefreshIntervalMinutes", 15);
+    }
+
+    public void setCalendarRefreshIntervalMinutes(int calendarRefreshIntervalMinutes) {
+        put("calendarRefreshIntervalMinutes", calendarRefreshIntervalMinutes);
+    }
 }

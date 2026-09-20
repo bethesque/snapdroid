@@ -29,9 +29,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 import de.badaix.snapcast.utils.NsdHelper;
 import de.badaix.snapcast.utils.Settings;
 
@@ -44,6 +46,7 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
     private EditText editStreamPort;
     private EditText editControlPort;
     private EditText editCalendarAlarmsUrl;
+    private EditText editCalendarRefreshIntervalMinutes;
     private CheckBox checkBoxResample;
     private Spinner spinnerAudioEngine;
 
@@ -64,6 +67,7 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
         editStreamPort = findViewById(R.id.stream_port);
         editControlPort = findViewById(R.id.control_port);
         editCalendarAlarmsUrl = findViewById(R.id.calendar_alarms_url);
+        editCalendarRefreshIntervalMinutes = findViewById(R.id.calendar_refresh_interval_minutes);
 
         spinnerAudioEngine = findViewById(R.id.audio_engine);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -88,9 +92,14 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
         }
         checkBoxResample.setChecked(settings.doResample());
         editCalendarAlarmsUrl.setText(settings.getCalendarAlarmsUrl());
+        editCalendarRefreshIntervalMinutes.setText(Integer.toString(settings.getCalendarRefreshIntervalMinutes()));
     }
 
-    private void saveSettings() {
+    /**
+     * @return true if settings were valid and saved, false if the save was rejected
+     * (the caller should keep the settings screen open so the user can fix the input).
+     */
+    private boolean saveSettings() {
         String host = editHost.getText().toString();
         int streamPort;
         int controlPort;
@@ -99,13 +108,28 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
             controlPort = Integer.parseInt(editControlPort.getText().toString());
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            return;
+            return false;
+        }
+
+        int refreshIntervalMinutes;
+        try {
+            refreshIntervalMinutes = Integer.parseInt(editCalendarRefreshIntervalMinutes.getText().toString());
+        } catch (NumberFormatException e) {
+            refreshIntervalMinutes = -1;
+        }
+        if (refreshIntervalMinutes < CalendarAlarmScheduler.MIN_REFRESH_INTERVAL_MINUTES) {
+            Toast.makeText(this, getString(R.string.calendar_refresh_interval_too_low,
+                    CalendarAlarmScheduler.MIN_REFRESH_INTERVAL_MINUTES), Toast.LENGTH_LONG).show();
+            return false;
         }
 
         Settings settings = Settings.getInstance(this);
         settings.setHost(host, streamPort, controlPort);
         settings.setAudioEngine(spinnerAudioEngine.getSelectedItem().toString(), checkBoxResample.isChecked());
         settings.setCalendarAlarmsUrl(editCalendarAlarmsUrl.getText().toString());
+        settings.setCalendarRefreshIntervalMinutes(refreshIntervalMinutes);
+        CalendarAlarmScheduler.schedulePeriodicRefresh(this);
+        return true;
     }
 
     @Override
@@ -130,8 +154,9 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
-            saveSettings();
-            finish();
+            if (saveSettings()) {
+                finish();
+            }
             return true;
         }
         return super.onOptionsItemSelected(item);

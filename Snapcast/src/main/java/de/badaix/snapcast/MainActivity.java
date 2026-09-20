@@ -98,9 +98,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         tvNextNotification = findViewById(R.id.tvNextNotification);
-        Button btnRefreshNotifications = findViewById(R.id.btnRefreshNotifications);
-        btnRefreshNotifications.setOnClickListener(v -> refreshCalendarNotifications());
-
         Button btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
         btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
 
@@ -108,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         btnStopAlarmForAll.setOnClickListener(v -> stopAlarmForAll());
 
         askNotificationPermission();
+        CalendarAlarmScheduler.schedulePeriodicRefresh(this);
     }
 
     @Override
