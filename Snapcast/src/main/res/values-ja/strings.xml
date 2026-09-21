@@ -1,14 +1,14 @@
 <resources>
     <string name="app_name">Snapcast</string>
-    <string name="ticker_text">Snapclient 開始しました</string>
-    <string name="notification_title">Snapclient</string>
-    <string name="notification_text">Snapclient は実行中です…</string>
+    <string name="ticker_text">通知ストリーマー 開始しました</string>
+    <string name="notification_title">通知ストリーマー</string>
+    <string name="notification_text">通知ストリーマー は実行中です…</string>
     <string name="notification_info">情報…</string>
     <string name="stop">停止</string>
     <string name="menu_details">詳細</string>
     <string name="menu_delete">削除</string>
 
-    <string name="title_activity_snapcast">Snapcast</string>
+    <string name="title_activity_snapcast">通知ストリーマー</string>
 
     <string name="action_about">アプリについて…</string>
     <string name="action_settings">設定…</string>

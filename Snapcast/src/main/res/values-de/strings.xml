@@ -1,15 +1,15 @@
 <resources>
     <string name="app_name">Snapcast</string>
-    <string name="ticker_text">Snapclient gestartet</string>
-    <string name="notification_title">Snapclient</string>
-    <string name="notification_text">Snapclient läuft…</string>
+    <string name="ticker_text">Benachrichtigungs-Streamer gestartet</string>
+    <string name="notification_title">Benachrichtigungs-Streamer</string>
+    <string name="notification_text">Benachrichtigungs-Streamer läuft…</string>
     <string name="notification_info">Info…</string>
     <string name="stop">Stop</string>
     <string name="menu_details">Details</string>
     <string name="menu_delete">Löschen</string>
     <string name="menu_group">Gruppe</string>
 
-    <string name="title_activity_snapcast">Snapcast</string>
+    <string name="title_activity_snapcast">Benachrichtigungs-Streamer</string>
 
     <string name="action_about">Über…</string>
     <string name="action_settings">Einstellungen…</string>

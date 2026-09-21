@@ -255,16 +255,17 @@ public class CalendarAlarmScheduler {
     }
 
     /**
-     * Returns how long the Snapclient should keep playing for the upcoming occurrence(s),
+     * Returns how long the Snapclient should keep running for the upcoming occurrence(s),
      * i.e. the longest duration_seconds among every notification sharing the next
-     * play_datetime, or 0 if there's nothing upcoming.
+     * play_datetime plus the lead time it was started early by, or 0 if there's nothing
+     * upcoming.
      */
     public static long getNextPlayDurationMillis(Context context) {
         long maxDurationSeconds = 0;
         for (CalendarNotification notification : getNextGroup(context)) {
             maxDurationSeconds = Math.max(maxDurationSeconds, notification.getDurationSeconds());
         }
-        return maxDurationSeconds * 1000L;
+        return maxDurationSeconds * 1000L + LEAD_TIME_MS;
     }
 
     /**

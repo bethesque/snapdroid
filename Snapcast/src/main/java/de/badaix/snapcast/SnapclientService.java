@@ -96,7 +96,7 @@ public class SnapclientService extends Service {
         NotificationManager notificationManager =
                 (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID,
-                "Snapclient service",
+                "Notification streamer service",
                 NotificationManager.IMPORTANCE_LOW);
         channel.setDescription("Snapcast player service");
         notificationManager.createNotificationChannel(channel);
