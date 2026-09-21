@@ -20,12 +20,15 @@ package de.badaix.snapcast;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,6 +69,24 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvNextLabel;
     private TextView tvNextNotification;
     private TextView tvNextDate;
+    private Button btnStopPhoneAlarm;
+
+    private boolean serviceBound = false;
+    private SnapclientService snapclientService;
+
+    private final ServiceConnection snapclientServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            snapclientService = ((SnapclientService.LocalBinder) service).getService();
+            serviceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            serviceBound = false;
+            snapclientService = null;
+        }
+    };
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -103,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         tvNextLabel = findViewById(R.id.tvNextLabel);
         tvNextNotification = findViewById(R.id.tvNextNotification);
         tvNextDate = findViewById(R.id.tvNextDate);
-        Button btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
+        btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
         btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
 
         Button btnStopAlarmForAll = findViewById(R.id.btnStopAlarmForAll);
@@ -117,6 +138,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateNextNotification();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Bind without BIND_AUTO_CREATE: this only connects if SnapclientService is
+        // already running, letting stopPhoneAlarm() know whether there's anything to stop.
+        bindService(new Intent(this, SnapclientService.class), snapclientServiceConnection, 0);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (serviceBound) {
+            unbindService(snapclientServiceConnection);
+            serviceBound = false;
+            snapclientService = null;
+        }
     }
 
     @Override
@@ -181,6 +220,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopPhoneAlarm() {
+        if (!serviceBound || !snapclientService.isRunning()) {
+            Toast.makeText(this, getString(R.string.snapclient_not_running), Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         BroadcastReceiver.startService(this, SnapclientService.ACTION_STOP);
         CalendarAlarmScheduler.cancelStop(this);
         showWarning(getString(R.string.phone_alarm_stopped));
