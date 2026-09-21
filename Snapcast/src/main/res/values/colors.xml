@@ -11,4 +11,6 @@
     <color name="colorTextOnLight">#515A4E</color>
     <color name="colorNextLabel">#677963</color>
     <color name="colorNotificationText">#4E5949</color>
+    <color name="colorButtonBackground">#DDE7DC</color>
+    <color name="colorButtonText">#717C6C</color>
 </resources>

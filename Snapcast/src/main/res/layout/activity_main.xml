@@ -60,8 +60,10 @@
             android:letterSpacing="0.15"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/colorNextLabel"
-            android:textSize="24sp"
-            android:visibility="gone" />
+            android:textSize="32sp"
+            android:visibility="gone"
+            android:layout_marginBottom="15dp"
+             />
 
         <TextView
             android:id="@+id/tvNextNotification"
@@ -72,7 +74,7 @@
             android:text="@string/no_upcoming_notification"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold"
-            android:textSize="36sp"
+            android:textSize="44sp"
             android:textColor="@color/colorNotificationText" />
 
         <TextView
@@ -82,31 +84,41 @@
             android:gravity="center"
             android:paddingBottom="24dp"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="italic"
-            android:textSize="24sp"
+            android:textStyle="bold|italic"
+            android:textSize="32sp"
             android:textColor="@color/colorNotificationText"
             android:visibility="gone" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStopPhoneAlarm"
             android:layout_width="wrap_content"
-            android:layout_height="42dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="30dp"
             android:paddingHorizontal="24dp"
+            android:gravity="center"
             android:textAllCaps="true"
-            android:textColor="@android:color/white"
+            android:textSize="21sp"
+            android:textColor="@color/colorButtonText"
             android:text="@string/action_stop_phone_alarm"
+            app:backgroundTint="@color/colorButtonBackground"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             app:cornerRadius="8dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStopAlarmForAll"
             android:layout_width="wrap_content"
-            android:layout_height="42dp"
+            android:layout_height="64dp"
             android:layout_marginTop="16dp"
             android:paddingHorizontal="24dp"
+            android:gravity="center"
             android:textAllCaps="true"
-            android:textColor="@android:color/white"
+            android:textSize="21sp"
+            android:textColor="@color/colorButtonText"
             android:text="@string/action_stop_alarm_for_all"
+            app:backgroundTint="@color/colorButtonBackground"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             app:cornerRadius="8dp" />
 
     </LinearLayout>

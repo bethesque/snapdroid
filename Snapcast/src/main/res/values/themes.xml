@@ -7,6 +7,7 @@
         <item name="colorAppBackground">@color/colorBackground</item>
         <item name="android:windowBackground">?attr/colorAppBackground</item>
         <item name="colorTopBar">@color/colorMainToolbar</item>
+        <item name="actionBarStyle">@style/AppTheme.ActionBar</item>
         <item name="colorTextOnBackground">@color/colorTextOnLight</item>
         <item name="statusBarBackground">?attr/colorPrimaryDark</item>
         <item name="android:fontFamily">sans-serif-condensed</item>

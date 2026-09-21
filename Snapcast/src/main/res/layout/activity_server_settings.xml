@@ -17,6 +17,7 @@
   -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -35,7 +36,7 @@
             android:paddingBottom="3dip"
             android:text="@string/section_calendar_alarms"
             android:textAllCaps="true"
-            android:textColor="?attr/colorAccent"
+            android:textColor="@color/colorNotificationText"
             android:textStyle="bold" />
 
         <LinearLayout
@@ -86,7 +87,7 @@
             android:paddingBottom="3dip"
             android:text="@string/section_snapserver"
             android:textAllCaps="true"
-            android:textColor="?attr/colorAccent"
+            android:textColor="@color/colorNotificationText"
             android:textStyle="bold" />
 
         <TableLayout
@@ -193,14 +194,6 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:visibility="gone" />
         </TableLayout>
-
-        <Button
-            android:id="@+id/btn_scan"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5dip"
-            android:text="@string/action_scan" />
 
     </LinearLayout>
 

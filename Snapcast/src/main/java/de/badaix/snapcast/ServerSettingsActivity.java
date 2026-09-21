@@ -18,14 +18,10 @@
 
 package de.badaix.snapcast;
 
-import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -34,14 +30,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
-import de.badaix.snapcast.utils.NsdHelper;
 import de.badaix.snapcast.utils.Settings;
 
-public class ServerSettingsActivity extends AppCompatActivity implements View.OnClickListener {
+public class ServerSettingsActivity extends AppCompatActivity {
 
-    private static final String TAG = "ServerSettings";
-
-    private Button btnScan;
     private EditText editHost;
     private EditText editStreamPort;
     private EditText editControlPort;
@@ -59,9 +51,6 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
             getSupportActionBar().setTitle(R.string.settings);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
-        btnScan = findViewById(R.id.btn_scan);
-        btnScan.setOnClickListener(this);
 
         editHost = findViewById(R.id.host);
         editStreamPort = findViewById(R.id.stream_port);
@@ -130,19 +119,6 @@ public class ServerSettingsActivity extends AppCompatActivity implements View.On
         settings.setCalendarRefreshIntervalMinutes(refreshIntervalMinutes);
         CalendarAlarmScheduler.schedulePeriodicRefresh(this);
         return true;
-    }
-
-    @Override
-    public void onClick(View v) {
-        NsdHelper.getInstance(this).startListening("_snapcast._tcp.", "Snapcast", new NsdHelper.NsdHelperListener() {
-            @Override
-            public void onResolved(NsdHelper nsdHelper, NsdServiceInfo serviceInfo) {
-                Log.d(TAG, "onResolved: " + serviceInfo.getHost().getCanonicalHostName());
-                editHost.setText(serviceInfo.getHost().getCanonicalHostName());
-                editStreamPort.setText(Integer.toString(serviceInfo.getPort()));
-                editControlPort.setText(Integer.toString(serviceInfo.getPort() + 1));
-            }
-        });
     }
 
     @Override
