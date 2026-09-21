@@ -74,7 +74,7 @@
             android:text="@string/no_upcoming_notification"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textStyle="bold"
-            android:textSize="44sp"
+            android:textSize="40sp"
             android:textColor="@color/colorNotificationText" />
 
         <TextView
