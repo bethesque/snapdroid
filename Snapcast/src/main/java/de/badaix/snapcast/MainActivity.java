@@ -129,6 +129,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button btnStopAlarmForAll = findViewById(R.id.btnStopAlarmForAll);
         btnStopAlarmForAll.setOnClickListener(v -> stopAlarmForAll());
+        btnStopPhoneAlarm.post(() -> {
+            btnStopAlarmForAll.getLayoutParams().width = btnStopPhoneAlarm.getWidth();
+            btnStopAlarmForAll.requestLayout();
+        });
 
         askNotificationPermission();
         CalendarAlarmScheduler.schedulePeriodicRefresh(this);
