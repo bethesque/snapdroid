@@ -67,7 +67,12 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
             i.putExtra(SnapclientService.EXTRA_PORT, port);
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (action == SnapclientService.ACTION_START && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Only ACTION_START leads to a startForeground() call in the service's
+            // onStartCommand(), so only that action may be dispatched via
+            // startForegroundService() (which requires startForeground() to be called
+            // within a few seconds or the app is killed). ACTION_STOP just tears the
+            // service down, so a plain startService() is used instead.
             context.startForegroundService(i);
         } else {
             context.startService(i);
