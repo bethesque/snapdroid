@@ -225,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopPhoneAlarm() {
         if (!serviceBound || !snapclientService.isRunning()) {
-            Toast.makeText(this, getString(R.string.snapclient_not_running), Toast.LENGTH_SHORT).show();
+            showWarning(getString(R.string.snapclient_not_running));
             return;
         }
 

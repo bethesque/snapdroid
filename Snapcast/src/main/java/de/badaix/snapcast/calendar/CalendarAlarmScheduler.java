@@ -144,7 +144,7 @@ public class CalendarAlarmScheduler {
             connection.setReadTimeout(READ_TIMEOUT_MS);
 
             int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
+            if (responseCode < 200 || responseCode >= 300) {
                 throw new IOException("Unexpected HTTP response code: " + responseCode);
             }
         } finally {
