@@ -6,4 +6,9 @@
     <color name="second_grey">#ff999999</color>
     <color name="card_white">#ffffffff</color>
     <color name="card_shadow">#8c666666</color>
+    <color name="colorBackground">#BED5B9</color>
+    <color name="colorMainToolbar">#4E5949</color>
+    <color name="colorTextOnLight">#515A4E</color>
+    <color name="colorNextLabel">#677963</color>
+    <color name="colorNotificationText">#4E5949</color>
 </resources>

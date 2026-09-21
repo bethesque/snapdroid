@@ -57,6 +57,7 @@ public class GroupListFragment extends Fragment {
     private GroupItem.GroupItemListener groupItemListener;
     private GroupAdapter groupAdapter;
     private ServerStatus serverStatus = null;
+    private TextView tvNextLabel;
     private TextView tvNextNotification;
 
     public GroupListFragment() {
@@ -79,6 +80,7 @@ public class GroupListFragment extends Fragment {
         Log.d(TAG, "onCreateView: " + this);
         View view = inflater.inflate(R.layout.fragment_group_list, container, false);
         ListView lvGroup = view.findViewById(R.id.lvGroup);
+        tvNextLabel = view.findViewById(R.id.tvNextLabel);
         tvNextNotification = view.findViewById(R.id.tvNextNotification);
         groupAdapter = new GroupAdapter(getContext(), groupItemListener);
         groupAdapter.updateServer(serverStatus);
@@ -127,10 +129,13 @@ public class GroupListFragment extends Fragment {
                 if (tvNextNotification == null)
                     return;
                 CalendarNotification next = CalendarAlarmScheduler.getNext(activity);
-                if (next == null)
+                if (next == null) {
+                    tvNextLabel.setVisibility(View.GONE);
                     tvNextNotification.setText(R.string.no_upcoming_notification);
-                else
+                } else {
+                    tvNextLabel.setVisibility(View.VISIBLE);
                     tvNextNotification.setText(activity.getString(R.string.next_notification, next.getSummary(), next.getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER)));
+                }
             }
         });
     }

@@ -35,41 +35,79 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="?attr/colorTopBar"
+            app:titleTextAppearance="@style/ToolbarTitle.AllCaps"
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:orientation="vertical"
         android:padding="24dp">
+
+        <TextView
+            android:id="@+id/tvNextLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="4dp"
+            android:text="@string/next_label"
+            android:textAllCaps="true"
+            android:letterSpacing="0.15"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/colorNextLabel"
+            android:textSize="24sp"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/tvNextNotification"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:paddingBottom="24dp"
+            android:paddingBottom="4dp"
             android:text="@string/no_upcoming_notification"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
+            android:textSize="36sp"
+            android:textColor="@color/colorNotificationText" />
 
-        <Button
+        <TextView
+            android:id="@+id/tvNextDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="24dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="italic"
+            android:textSize="24sp"
+            android:textColor="@color/colorNotificationText"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStopPhoneAlarm"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="42dp"
             android:layout_marginTop="16dp"
-            android:text="@string/action_stop_phone_alarm" />
+            android:paddingHorizontal="24dp"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:text="@string/action_stop_phone_alarm"
+            app:cornerRadius="8dp" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnStopAlarmForAll"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="42dp"
             android:layout_marginTop="16dp"
-            android:text="@string/action_stop_alarm_for_all" />
+            android:paddingHorizontal="24dp"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:text="@string/action_stop_alarm_for_all"
+            app:cornerRadius="8dp" />
 
     </LinearLayout>
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorAppBackground" format="color" />
+    <attr name="colorTopBar" format="color" />
+    <attr name="colorTextOnBackground" format="color" />
+</resources>

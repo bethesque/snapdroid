@@ -48,14 +48,16 @@
                 android:layout_height="wrap_content"
                 android:padding="3dip"
                 android:text="@string/calendar_alarms_url"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorTextOnBackground" />
 
             <EditText
                 android:id="@+id/calendar_alarms_url"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/calendar_alarms_url_hint"
-                android:inputType="textUri" />
+                android:inputType="textUri"
+                android:textColor="?attr/colorTextOnBackground" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -63,7 +65,8 @@
                 android:layout_marginTop="8dp"
                 android:padding="3dip"
                 android:text="@string/calendar_refresh_interval_minutes"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?attr/colorTextOnBackground" />
 
             <EditText
                 android:id="@+id/calendar_refresh_interval_minutes"
@@ -71,7 +74,8 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="number"
-                android:text="15" />
+                android:text="15"
+                android:textColor="?attr/colorTextOnBackground" />
         </LinearLayout>
 
         <TextView
@@ -98,7 +102,8 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/host"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?attr/colorTextOnBackground" />
 
                 <EditText
                     android:id="@+id/host"
@@ -106,7 +111,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="7dp"
                     android:inputType="textNoSuggestions"
-                    android:text="localhost" />
+                    android:text="localhost"
+                    android:textColor="?attr/colorTextOnBackground" />
             </TableRow>
 
             <TableRow
@@ -118,7 +124,8 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/streaming_port"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?attr/colorTextOnBackground" />
 
                 <EditText
                     android:id="@+id/stream_port"
@@ -127,7 +134,8 @@
                     android:layout_marginLeft="7dp"
                     android:ems="10"
                     android:inputType="number"
-                    android:text="1704" />
+                    android:text="1704"
+                    android:textColor="?attr/colorTextOnBackground" />
 
             </TableRow>
 
@@ -140,7 +148,8 @@
                     android:layout_height="wrap_content"
                     android:padding="3dip"
                     android:text="@string/control_port"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?attr/colorTextOnBackground" />
 
                 <EditText
                     android:id="@+id/control_port"
@@ -149,7 +158,8 @@
                     android:layout_marginLeft="7dp"
                     android:ems="10"
                     android:inputType="number"
-                    android:text="1705" />
+                    android:text="1705"
+                    android:textColor="?attr/colorTextOnBackground" />
 
             </TableRow>
 

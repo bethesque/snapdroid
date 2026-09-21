@@ -28,6 +28,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -62,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
             .toFormatter(Locale.getDefault());
 
     private CoordinatorLayout coordinatorLayout;
+    private TextView tvNextLabel;
     private TextView tvNextNotification;
+    private TextView tvNextDate;
 
     private final ActivityResultLauncher<String> requestPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -97,7 +100,9 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        tvNextLabel = findViewById(R.id.tvNextLabel);
         tvNextNotification = findViewById(R.id.tvNextNotification);
+        tvNextDate = findViewById(R.id.tvNextDate);
         Button btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
         btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
 
@@ -195,13 +200,18 @@ public class MainActivity extends AppCompatActivity {
     private void updateNextNotification() {
         List<CalendarNotification> nextGroup = CalendarAlarmScheduler.getNextGroup(this);
         if (nextGroup.isEmpty()) {
+            tvNextLabel.setVisibility(View.GONE);
             tvNextNotification.setText(R.string.no_upcoming_notification);
+            tvNextDate.setVisibility(View.GONE);
         } else {
             String summaries = nextGroup.stream()
                     .map(CalendarNotification::getSummary)
                     .collect(Collectors.joining(", "));
             String when = nextGroup.get(0).getPlayDateTime().format(NEXT_NOTIFICATION_FORMATTER);
-            tvNextNotification.setText(getString(R.string.next_notification, summaries, when));
+            tvNextLabel.setVisibility(View.VISIBLE);
+            tvNextNotification.setText(summaries);
+            tvNextDate.setText(when);
+            tvNextDate.setVisibility(View.VISIBLE);
         }
     }
 
