@@ -23,6 +23,8 @@ import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -286,7 +288,7 @@ public class CalendarAlarmScheduler {
 
         long triggerAtMillis = Math.max(System.currentTimeMillis(), next.getPlayDateTime().toInstant().toEpochMilli() - LEAD_TIME_MS);
         Log.i(TAG, "scheduleNext: \"" + next.getSummary() + "\" at " + next.getPlayDateTime()
-                + ", waking up at " + Instant.ofEpochMilli(triggerAtMillis));
+                + ", waking up at " + OffsetDateTime.ofInstant(Instant.ofEpochMilli(triggerAtMillis), ZoneId.systemDefault()));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             Log.w(TAG, "scheduleNext: exact alarm permission not granted, cannot schedule");
@@ -315,7 +317,7 @@ public class CalendarAlarmScheduler {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent stopPendingIntent = buildStopPendingIntent(context);
         long triggerAtMillis = SystemClock.elapsedRealtime() + durationMillis;
-        Log.i(TAG, "scheduleStop: waking up at " + Instant.now().plusMillis(durationMillis));
+        Log.i(TAG, "scheduleStop: waking up at " + OffsetDateTime.ofInstant(Instant.now().plusMillis(durationMillis), ZoneId.systemDefault()));
         try {
             setExactAlarm(alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtMillis, stopPendingIntent);
         } catch (SecurityException e) {
