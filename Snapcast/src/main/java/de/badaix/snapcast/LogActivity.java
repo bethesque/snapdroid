@@ -34,6 +34,7 @@ public class LogActivity extends AppCompatActivity {
     // Ordered to match res/values/ids.xml's log_level_array, so the spinner's
     // selected index can be used directly to look up the minimum priority.
     private static final int[] LEVELS = {Log.VERBOSE, Log.DEBUG, Log.INFO, Log.WARN, Log.ERROR};
+    private static final int DEFAULT_LEVEL_POSITION = 2; // INFO
 
     private TextView tvLog;
     private String rawLogs = "";
@@ -50,6 +51,7 @@ public class LogActivity extends AppCompatActivity {
                 R.array.log_level_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerLogLevel.setAdapter(adapter);
+        spinnerLogLevel.setSelection(DEFAULT_LEVEL_POSITION);
         spinnerLogLevel.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
