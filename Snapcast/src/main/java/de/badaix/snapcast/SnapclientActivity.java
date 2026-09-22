@@ -290,7 +290,6 @@ public class SnapclientActivity extends AppCompatActivity implements GroupItem.G
 
     @Override
     public void onLog(SnapclientService snapclientService, String timestamp, String logClass, String tag, String msg) {
-        Log.d(TAG, "[" + logClass + "] (" + tag + ") " + msg);
         if ("Info".equals(logClass) && "Controller".equals(tag)) {
             /* String key = "sampleformat: ";
             if (msg.contains(key)) {

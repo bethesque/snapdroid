@@ -313,42 +313,72 @@ public class SnapclientService extends Service {
             if (listener != null)
                 listener.onPlayerStart(this);
         }
-        if (listener != null) {
-            int idxSeverityOpen = msg.indexOf('[');
-            int idxSeverityClose = msg.indexOf(']', idxSeverityOpen);
-            int idxTagOpen = msg.indexOf('(', idxSeverityClose);
-            int idxTagClose = msg.indexOf(')', idxTagOpen);
-            if ((idxSeverityOpen > 0) && (idxSeverityClose > 0)) {
-                String severity = msg.substring(idxSeverityOpen + 1, idxSeverityClose);
-                String tag = "";
-                if ((idxTagOpen > 0) && (idxTagClose > 0))
-                    tag = msg.substring(idxTagOpen + 1, idxTagClose);
-                String timestamp = msg.substring(0, idxSeverityOpen - 1);
-                String message = msg.substring(Math.max(idxSeverityClose, idxTagClose) + 2);
+        int idxSeverityOpen = msg.indexOf('[');
+        int idxSeverityClose = msg.indexOf(']', idxSeverityOpen);
+        int idxTagOpen = msg.indexOf('(', idxSeverityClose);
+        int idxTagClose = msg.indexOf(')', idxTagOpen);
+        if ((idxSeverityOpen > 0) && (idxSeverityClose > 0)) {
+            String severity = msg.substring(idxSeverityOpen + 1, idxSeverityClose);
+            String tag = "";
+            if ((idxTagOpen > 0) && (idxTagClose > 0))
+                tag = msg.substring(idxTagOpen + 1, idxTagClose);
+            String timestamp = msg.substring(0, idxSeverityOpen - 1);
+            String message = msg.substring(Math.max(idxSeverityClose, idxTagClose) + 2);
+
+            // Persisted here (rather than left solely to the listener) so it's captured
+            // even when no Activity is bound, e.g. during alarm-triggered playback.
+            logAtSeverity(severity, "[" + severity + "] (" + tag + ") " + message);
+
+            if (listener != null)
                 listener.onLog(SnapclientService.this, timestamp, severity, tag, message);
 
-                if ((message.equals("Init start")) && (restartRunnable == null)) {
-                    restartRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.i(TAG, "Restarting Snapclient");
-                            stopProcess();
-                            try {
-                                startProcess();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+            if ((message.equals("Init start")) && (restartRunnable == null)) {
+                restartRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.i(TAG, "Restarting Snapclient");
+                        stopProcess();
+                        try {
+                            startProcess();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    };
-                    restartHandler.postDelayed(restartRunnable, 3000);
-                } else if ((message.contains("Init failed")) && (restartHandler != null)) {
-                    restartHandler.removeCallbacks(restartRunnable);
-                    restartHandler.post(restartRunnable);
-                } else if ((message.equals("Init done")) && (restartHandler != null)) {
-                    restartHandler.removeCallbacks(restartRunnable);
-                    restartRunnable = null;
-                }
+                    }
+                };
+                restartHandler.postDelayed(restartRunnable, 3000);
+            } else if ((message.contains("Init failed")) && (restartHandler != null)) {
+                restartHandler.removeCallbacks(restartRunnable);
+                restartHandler.post(restartRunnable);
+            } else if ((message.equals("Init done")) && (restartHandler != null)) {
+                restartHandler.removeCallbacks(restartRunnable);
+                restartRunnable = null;
             }
+        }
+    }
+
+    // Maps libsnapclient's aixlog severities (see aixlog.hpp's Severity::to_string) to
+    // the equivalent android.util.Log priority, so its own log level is preserved in the
+    // persisted log file instead of everything being recorded as DEBUG.
+    private static void logAtSeverity(String severity, String message) {
+        switch (severity) {
+            case "Trace":
+                Log.v(TAG, message);
+                break;
+            case "Debug":
+                Log.d(TAG, message);
+                break;
+            case "Warn":
+                Log.w(TAG, message);
+                break;
+            case "Error":
+            case "Fatal":
+                Log.e(TAG, message);
+                break;
+            case "Info":
+            case "Notice":
+            default:
+                Log.i(TAG, message);
+                break;
         }
     }
 
