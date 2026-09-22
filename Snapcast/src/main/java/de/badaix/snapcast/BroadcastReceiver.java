@@ -25,7 +25,7 @@ import android.text.TextUtils;
 
 import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 import de.badaix.snapcast.utils.Settings;
-import db.badaix.snapcast.Log;
+import de.badaix.snapcast.utils.Log;
 
 /**
  * Created by johannes on 05.05.16.
