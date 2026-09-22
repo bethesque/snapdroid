@@ -18,8 +18,6 @@
 
 package de.badaix.snapcast.control;
 
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -30,6 +28,8 @@ import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import de.badaix.snapcast.utils.Log;
 
 /**
  * Created by johannes on 06.01.16.
@@ -124,7 +124,7 @@ public class TcpClient {
                 try {
                     String message = messages.poll(50, TimeUnit.MILLISECONDS);
                     if ((message != null) && (mBufferOut != null)) {
-                        Log.d(TAG, "Sending: " + message);
+                        Log.v(TAG, "Sending: " + message);
                         mBufferOut.println(message + "\r\n");
                         mBufferOut.flush();
                     }
@@ -184,7 +184,7 @@ public class TcpClient {
                     mServerMessage = mBufferIn.readLine();
 
                     if (mServerMessage != null) {
-                        Log.d(TAG, "Received Message: '" + mServerMessage + "'");
+                        Log.v(TAG, "Received Message: '" + mServerMessage + "'");
                         if (mMessageListener != null) {
                             mMessageListener.onMessageReceived(TcpClient.this, mServerMessage);
                         }

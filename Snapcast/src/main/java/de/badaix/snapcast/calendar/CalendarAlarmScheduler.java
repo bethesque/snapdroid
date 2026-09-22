@@ -8,7 +8,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +36,7 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import de.badaix.snapcast.CalendarAlarmReceiver;
+import de.badaix.snapcast.utils.Log;
 import de.badaix.snapcast.utils.Settings;
 
 /**
@@ -214,7 +214,7 @@ public class CalendarAlarmScheduler {
             socket.connect(new InetSocketAddress(host, settings.getControlPort()), SNAPSERVER_REACHABLE_TIMEOUT_MS);
             return true;
         } catch (IOException e) {
-            Log.d(TAG, "isSnapserverReachable: " + host + " unreachable", e);
+            Log.i(TAG, "isSnapserverReachable: " + host + " unreachable", e);
             return false;
         }
     }
@@ -280,12 +280,12 @@ public class CalendarAlarmScheduler {
 
         CalendarNotification next = getNext(context);
         if (next == null) {
-            Log.d(TAG, "scheduleNext: no upcoming notifications, nothing scheduled");
+            Log.i(TAG, "scheduleNext: no upcoming notifications, nothing scheduled");
             return false;
         }
 
         long triggerAtMillis = Math.max(System.currentTimeMillis(), next.getPlayDateTime().toInstant().toEpochMilli() - LEAD_TIME_MS);
-        Log.d(TAG, "scheduleNext: \"" + next.getSummary() + "\" at " + next.getPlayDateTime());
+        Log.i(TAG, "scheduleNext: \"" + next.getSummary() + "\" at " + next.getPlayDateTime());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             Log.w(TAG, "scheduleNext: exact alarm permission not granted, cannot schedule");

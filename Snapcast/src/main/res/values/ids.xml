@@ -9,4 +9,12 @@
         <item>OpenSL</item>
         <item>Oboe</item>
     </string-array>
+
+    <string-array name="log_level_array">
+        <item>VERBOSE</item>
+        <item>DEBUG</item>
+        <item>INFO</item>
+        <item>WARN</item>
+        <item>ERROR</item>
+    </string-array>
 </resources>

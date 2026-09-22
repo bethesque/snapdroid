@@ -20,7 +20,6 @@ package de.badaix.snapcast;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +40,7 @@ import de.badaix.snapcast.calendar.CalendarNotification;
 import de.badaix.snapcast.control.json.Client;
 import de.badaix.snapcast.control.json.Group;
 import de.badaix.snapcast.control.json.ServerStatus;
+import de.badaix.snapcast.utils.Log;
 
 
 /**

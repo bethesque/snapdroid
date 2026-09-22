@@ -1,12 +1,12 @@
 package de.badaix.snapcast.calendar;
 
 import android.content.Context;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
+import de.badaix.snapcast.utils.Log;
 import de.badaix.snapcast.utils.Settings;
 
 /**
@@ -36,7 +36,7 @@ public class CalendarRefreshWorker extends Worker {
             CalendarAlarmScheduler.scheduleNext(context);
             return Result.success();
         } catch (Exception e) {
-            Log.d(TAG, "Periodic calendar refresh failed, will retry", e);
+            Log.i(TAG, "Periodic calendar refresh failed, will retry", e);
             return Result.retry();
         }
     }

@@ -181,6 +181,9 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.action_refresh_notifications) {
             refreshCalendarNotifications();
             return true;
+        } else if (id == R.id.action_logs) {
+            startActivity(new Intent(this, LogActivity.class));
+            return true;
         } else if (id == R.id.action_about) {
             startActivity(new Intent(this, AboutActivity.class));
             return true;

@@ -21,7 +21,6 @@ package de.badaix.snapcast;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,6 +37,7 @@ import de.badaix.snapcast.control.json.Group;
 import de.badaix.snapcast.control.json.ServerStatus;
 import de.badaix.snapcast.control.json.Stream;
 import de.badaix.snapcast.control.json.Volume;
+import de.badaix.snapcast.utils.Log;
 
 /**
  * Created by johannes on 04.12.16.

@@ -25,13 +25,17 @@ import android.text.TextUtils;
 
 import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
 import de.badaix.snapcast.utils.Settings;
+import db.badaix.snapcast.Log;
 
 /**
  * Created by johannes on 05.05.16.
  */
 public class BroadcastReceiver extends android.content.BroadcastReceiver {
+    private static final String TAG = "BroadcastReceiver";
+
     @Override
     public void onReceive(Context context, Intent intent) {
+        Log.i(TAG, "Received intent " + intent.getAction().toString());
         switch (intent.getAction()) {
             // Re-arm the next calendar alarm notification from persisted data on boot.
             // WorkManager re-schedules its own periodic work after reboot, but calling

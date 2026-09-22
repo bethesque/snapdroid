@@ -28,7 +28,6 @@ package de.badaix.snapcast.utils;
  */
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;

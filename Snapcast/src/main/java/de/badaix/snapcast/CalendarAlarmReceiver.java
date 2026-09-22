@@ -2,9 +2,9 @@ package de.badaix.snapcast;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
+import de.badaix.snapcast.utils.Log;
 
 /**
  * Fires from AlarmManager 45 seconds before an upcoming calendar notification's
@@ -28,7 +28,7 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
                         BroadcastReceiver.startService(appContext, SnapclientService.ACTION_START);
                         CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
                     } else {
-                        Log.d(TAG, "onReceive: snapserver unreachable (not on home network?), skipping this occurrence");
+                        Log.i(TAG, "onReceive: snapserver unreachable (not on home network?), skipping this occurrence");
                         CalendarAlarmScheduler.scheduleNext(appContext);
                     }
                 } finally {

@@ -19,6 +19,11 @@
         android:title="@string/action_refresh_notifications"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_logs"
+        android:orderInCategory="100"
+        android:title="@string/action_logs"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_about"
         android:orderInCategory="100"
         android:title="@string/action_about"

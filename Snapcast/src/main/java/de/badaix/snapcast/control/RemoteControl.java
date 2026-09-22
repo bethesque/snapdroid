@@ -18,8 +18,6 @@
 
 package de.badaix.snapcast.control;
 
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,6 +30,7 @@ import de.badaix.snapcast.control.json.Group;
 import de.badaix.snapcast.control.json.ServerStatus;
 import de.badaix.snapcast.control.json.Stream;
 import de.badaix.snapcast.control.json.Volume;
+import de.badaix.snapcast.utils.Log;
 
 /**
  * Created by johannes on 13.01.16.

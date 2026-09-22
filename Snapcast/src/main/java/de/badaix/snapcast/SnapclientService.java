@@ -38,7 +38,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
@@ -49,6 +48,7 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.UUID;
 
+import de.badaix.snapcast.utils.Log;
 import de.badaix.snapcast.utils.Settings;
 
 /**
@@ -238,7 +238,7 @@ public class SnapclientService extends Service {
             //     }
             // }
         }
-        Log.i(TAG, "Configured engine: " + configuredEngine + ", active engine: " + player + ", sampleformat: " + sampleformat);
+        Log.d(TAG, "Configured engine: " + configuredEngine + ", active engine: " + player + ", sampleformat: " + sampleformat);
         // Log.i(TAG, "Configured engine: " + configuredEngine + ", active engine: " + player + ", sampleformat: " + sampleformat + ", isBluetoothA2dpOn: " + bta2dp);
 
         ProcessBuilder pb = new ProcessBuilder()
