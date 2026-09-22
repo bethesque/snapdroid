@@ -3,10 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/snapdroid.iml" filepath="$PROJECT_DIR$/.idea/modules/snapdroid.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.iml" filepath="$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.androidTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.main.iml" filepath="$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/Snapcast/snapdroid.Snapcast.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.iml" filepath="$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.main.iml" filepath="$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/CalendarAlarms/snapdroid.CalendarAlarms.unitTest.iml" />
     </modules>
   </component>
 </project>

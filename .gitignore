@@ -79,7 +79,8 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 
-Snapcast/release/output.json
+CalendarAlarms/release/output.json
 
-Snapcast/.cxx
-Snapcast/libs/*.aar
+CalendarAlarms/.cxx
+CalendarAlarms/libs/*.aar
+.idea
