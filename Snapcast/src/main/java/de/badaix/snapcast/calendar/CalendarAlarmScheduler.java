@@ -285,7 +285,8 @@ public class CalendarAlarmScheduler {
         }
 
         long triggerAtMillis = Math.max(System.currentTimeMillis(), next.getPlayDateTime().toInstant().toEpochMilli() - LEAD_TIME_MS);
-        Log.i(TAG, "scheduleNext: \"" + next.getSummary() + "\" at " + next.getPlayDateTime());
+        Log.i(TAG, "scheduleNext: \"" + next.getSummary() + "\" at " + next.getPlayDateTime()
+                + ", waking up at " + Instant.ofEpochMilli(triggerAtMillis));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             Log.w(TAG, "scheduleNext: exact alarm permission not granted, cannot schedule");
@@ -314,6 +315,7 @@ public class CalendarAlarmScheduler {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent stopPendingIntent = buildStopPendingIntent(context);
         long triggerAtMillis = SystemClock.elapsedRealtime() + durationMillis;
+        Log.i(TAG, "scheduleStop: waking up at " + Instant.now().plusMillis(durationMillis));
         try {
             setExactAlarm(alarmManager, AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtMillis, stopPendingIntent);
         } catch (SecurityException e) {
