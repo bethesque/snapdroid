@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.badaix.snapcast;
+package au.bethesque.calendaralarms;
 
 import android.Manifest;
 import android.app.AlarmManager;
@@ -54,9 +54,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
-import de.badaix.snapcast.calendar.CalendarNotification;
-import de.badaix.snapcast.utils.Settings;
+import de.badaix.snapcast.AboutActivity;
+import de.badaix.snapcast.BroadcastReceiver;
+import de.badaix.snapcast.LogActivity;
+import de.badaix.snapcast.R;
+import de.badaix.snapcast.SnapclientActivity;
+import de.badaix.snapcast.SnapclientService;
 
 public class MainActivity extends AppCompatActivity {
 

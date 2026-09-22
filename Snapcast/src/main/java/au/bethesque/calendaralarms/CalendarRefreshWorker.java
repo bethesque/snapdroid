@@ -1,4 +1,4 @@
-package de.badaix.snapcast.calendar;
+package au.bethesque.calendaralarms;
 
 import android.content.Context;
 
@@ -6,8 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import de.badaix.snapcast.utils.Log;
-import de.badaix.snapcast.utils.Settings;
+import au.bethesque.calendaralarms.utils.Log;
+
 
 /**
  * Periodically re-fetches the Calendar Alarms feed in the background (see

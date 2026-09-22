@@ -23,9 +23,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.text.TextUtils;
 
-import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
-import de.badaix.snapcast.utils.Settings;
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.CalendarAlarmScheduler;
+import au.bethesque.calendaralarms.Settings;
+import au.bethesque.calendaralarms.utils.Log;
 
 /**
  * Created by johannes on 05.05.16.
@@ -56,7 +56,7 @@ public class BroadcastReceiver extends android.content.BroadcastReceiver {
         }
     }
 
-    static void startService(Context context, String action) {
+    public static void startService(Context context, String action) {
         Intent i = new Intent(context, SnapclientService.class);
         i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         i.setAction(action);

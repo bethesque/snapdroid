@@ -48,8 +48,8 @@ import java.io.InputStreamReader;
 import java.util.Map;
 import java.util.UUID;
 
-import de.badaix.snapcast.utils.Log;
-import de.badaix.snapcast.utils.Settings;
+import au.bethesque.calendaralarms.utils.Log;
+import au.bethesque.calendaralarms.Settings;
 
 /**
  * Created by johannes on 01.01.16.
@@ -396,7 +396,7 @@ public class SnapclientService extends Service {
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class LocalBinder extends Binder {
-        SnapclientService getService() {
+        public SnapclientService getService() {
             // Return this instance of LocalService so clients can call public methods
             return SnapclientService.this;
         }

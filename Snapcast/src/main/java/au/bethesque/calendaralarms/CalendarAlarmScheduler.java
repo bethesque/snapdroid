@@ -1,4 +1,4 @@
-package de.badaix.snapcast.calendar;
+package au.bethesque.calendaralarms;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -37,9 +37,8 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import de.badaix.snapcast.CalendarAlarmReceiver;
-import de.badaix.snapcast.utils.Log;
-import de.badaix.snapcast.utils.Settings;
+import au.bethesque.calendaralarms.utils.Log;
+
 
 /**
  * Fetches and persists the "Calendar Alarms URL" feed, and drives the AlarmManager

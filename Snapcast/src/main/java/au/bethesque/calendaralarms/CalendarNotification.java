@@ -1,4 +1,4 @@
-package de.badaix.snapcast.calendar;
+package au.bethesque.calendaralarms;
 
 import org.json.JSONException;
 import org.json.JSONObject;

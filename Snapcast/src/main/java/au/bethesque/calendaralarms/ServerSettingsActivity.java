@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.badaix.snapcast;
+package au.bethesque.calendaralarms;
 
 import android.os.Bundle;
 import android.view.Menu;
@@ -29,8 +29,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
-import de.badaix.snapcast.utils.Settings;
+import de.badaix.snapcast.R;
 
 public class ServerSettingsActivity extends AppCompatActivity {
 

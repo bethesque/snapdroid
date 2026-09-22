@@ -16,7 +16,7 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.badaix.snapcast.utils;
+package au.bethesque.calendaralarms;
 
 import android.content.Context;
 import android.content.SharedPreferences;

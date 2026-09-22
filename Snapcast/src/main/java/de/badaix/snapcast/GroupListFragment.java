@@ -35,12 +35,12 @@ import androidx.fragment.app.FragmentActivity;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
-import de.badaix.snapcast.calendar.CalendarNotification;
+import au.bethesque.calendaralarms.CalendarAlarmScheduler;
+import au.bethesque.calendaralarms.CalendarNotification;
 import de.badaix.snapcast.control.json.Client;
 import de.badaix.snapcast.control.json.Group;
 import de.badaix.snapcast.control.json.ServerStatus;
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.utils.Log;
 
 
 /**

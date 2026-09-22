@@ -28,7 +28,7 @@
         android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name="au.bethesque.calendaralarms.MainActivity"
             android:configChanges="orientation|screenSize"
             android:exported="true"
             android:label="@string/app_name"
@@ -45,11 +45,11 @@
             android:name=".SnapclientActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_snapcast"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName="au.bethesque.calendaralarms.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value="au.bethesque.calendaralarms.MainActivity" />
         </activity>
 
         <receiver
@@ -68,7 +68,7 @@
             android:foregroundServiceType="mediaPlayback" />
 
         <receiver
-            android:name=".CalendarAlarmReceiver"
+            android:name="au.bethesque.calendaralarms.CalendarAlarmReceiver"
             android:exported="false" />
 
         <!-- android:theme="@style/Theme.AppCompat.Light.DialogWhenLarge" -->
@@ -92,28 +92,28 @@
             android:name=".AboutActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_about"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="au.bethesque.calendaralarms.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value="au.bethesque.calendaralarms.MainActivity" />
         </activity>
         <activity
             android:name=".LogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_logs"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="au.bethesque.calendaralarms.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value="au.bethesque.calendaralarms.MainActivity" />
         </activity>
         <activity
-            android:name=".ServerSettingsActivity"
+            android:name="au.bethesque.calendaralarms.ServerSettingsActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName="au.bethesque.calendaralarms.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value="au.bethesque.calendaralarms.MainActivity" />
         </activity>
     </application>
 

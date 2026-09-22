@@ -55,9 +55,9 @@ import de.badaix.snapcast.control.json.Group;
 import de.badaix.snapcast.control.json.ServerStatus;
 import de.badaix.snapcast.control.json.Stream;
 import de.badaix.snapcast.control.json.Volume;
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.utils.Log;
 import de.badaix.snapcast.utils.NsdHelper;
-import de.badaix.snapcast.utils.Settings;
+import au.bethesque.calendaralarms.Settings;
 
 public class SnapclientActivity extends AppCompatActivity implements GroupItem.GroupItemListener, RemoteControl.RemoteControlListener, SnapclientService.SnapclientListener, NsdHelper.NsdHelperListener {
 

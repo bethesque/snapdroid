@@ -1,10 +1,11 @@
-package de.badaix.snapcast;
+package au.bethesque.calendaralarms;
 
 import android.content.Context;
 import android.content.Intent;
 
-import de.badaix.snapcast.calendar.CalendarAlarmScheduler;
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.utils.Log;
+import de.badaix.snapcast.BroadcastReceiver;
+import de.badaix.snapcast.SnapclientService;
 
 /**
  * Fires from AlarmManager 45 seconds before an upcoming calendar notification's

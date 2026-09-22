@@ -31,6 +31,8 @@ import android.os.Build;
 
 import java.net.InetAddress;
 
+import au.bethesque.calendaralarms.utils.Log;
+
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class NsdHelper {
 

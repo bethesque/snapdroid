@@ -29,7 +29,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.utils.Log;
 
 /**
  * Created by johannes on 06.01.16.

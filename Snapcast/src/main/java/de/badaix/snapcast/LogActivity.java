@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.utils.Log;
 
 public class LogActivity extends AppCompatActivity {
 

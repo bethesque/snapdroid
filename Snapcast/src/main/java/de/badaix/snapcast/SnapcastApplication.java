@@ -20,7 +20,7 @@ package de.badaix.snapcast;
 
 import android.app.Application;
 
-import de.badaix.snapcast.utils.Log;
+import au.bethesque.calendaralarms.utils.Log;
 
 public class SnapcastApplication extends Application {
 
