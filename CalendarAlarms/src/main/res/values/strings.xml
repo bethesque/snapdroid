@@ -20,6 +20,7 @@
     <string name="action_logs">Logs…</string>
     <string name="title_activity_logs">Logs</string>
     <string name="no_logs">No logs yet</string>
+    <string name="jump_to_latest">Jump to latest</string>
     <string name="action_stop_phone_alarm">Stop alarm on phone</string>
     <string name="phone_alarm_stopped">Phone alarm stopped</string>
     <string name="snapclient_not_running">Notification streamer isn\'t running on this phone</string>

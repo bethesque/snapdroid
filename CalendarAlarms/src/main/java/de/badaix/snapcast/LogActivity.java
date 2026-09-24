@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -45,6 +46,10 @@ public class LogActivity extends AppCompatActivity {
         setContentView(R.layout.activity_log);
 
         tvLog = findViewById(R.id.tvLog);
+
+        ScrollView scrollLog = findViewById(R.id.scrollLog);
+        findViewById(R.id.btnJumpToLatest).setOnClickListener(v ->
+                scrollLog.post(() -> scrollLog.fullScroll(View.FOCUS_DOWN)));
 
         Spinner spinnerLogLevel = findViewById(R.id.spinnerLogLevel);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
