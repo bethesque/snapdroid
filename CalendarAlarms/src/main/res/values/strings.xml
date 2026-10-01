@@ -57,6 +57,9 @@
     <string name="client_stream">Stream</string>
     <string name="section_snapserver">Snapserver</string>
     <string name="section_calendar_alarms">Calendar alarms</string>
+    <string name="notifications_disabled_banner">Notifications muted</string>
+    <string name="action_enable_notifications">Unmute notifications</string>
+    <string name="action_disable_notifications">Mute notifications</string>
     <string name="host">Host</string>
     <string name="streaming_port">stream port</string>
     <string name="control_port">control port</string>

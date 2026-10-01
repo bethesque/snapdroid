@@ -25,7 +25,12 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
             Context appContext = context.getApplicationContext();
             new Thread(() -> {
                 try {
-                    if (CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
+                    if (!Settings.getInstance(appContext).isNotificationsEnabled()) {
+                        // Still arm the stop alarm (without playing) so the feed keeps
+                        // being refreshed and the next occurrence re-armed as normal.
+                        Log.i(TAG, "onReceive: notifications disabled, not playing this occurrence");
+                        CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
+                    } else if (CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
                         BroadcastReceiver.startService(appContext, SnapclientService.ACTION_START);
                         CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
                     } else {

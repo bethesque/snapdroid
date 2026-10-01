@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.time.format.DateTimeFormatter;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             .toFormatter(Locale.getDefault());
 
     private CoordinatorLayout coordinatorLayout;
+    private TextView tvNotificationsDisabled;
     private TextView tvNextLabel;
     private TextView tvNextNotification;
     private TextView tvNextDate;
@@ -124,6 +127,8 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        tvNotificationsDisabled = findViewById(R.id.tvNotificationsDisabled);
+        styleAsSnackbar(tvNotificationsDisabled);
         tvNextLabel = findViewById(R.id.tvNextLabel);
         tvNextNotification = findViewById(R.id.tvNextNotification);
         tvNextDate = findViewById(R.id.tvNextDate);
@@ -145,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         updateNextNotification();
+        invalidateOptionsMenu();
     }
 
     @Override
@@ -172,10 +178,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean enabled = Settings.getInstance(this).isNotificationsEnabled();
+        MenuItem toggle = menu.findItem(R.id.action_toggle_notifications);
+        toggle.setIcon(enabled ? R.drawable.volume_up_24px : R.drawable.volume_off_24px);
+        toggle.setTitle(enabled ? R.string.action_disable_notifications : R.string.action_enable_notifications);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_toggle_notifications) {
+            Settings settings = Settings.getInstance(this);
+            settings.setNotificationsEnabled(!settings.isNotificationsEnabled());
+            invalidateOptionsMenu();
+            updateNextNotification();
+            return true;
+        } else if (id == R.id.action_settings) {
             startActivity(new Intent(this, ServerSettingsActivity.class));
             return true;
         } else if (id == R.id.action_snapclient) {
@@ -252,6 +273,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateNextNotification() {
+        boolean enabled = Settings.getInstance(this).isNotificationsEnabled();
+        tvNotificationsDisabled.setVisibility(enabled ? View.GONE : View.VISIBLE);
+        float alpha = enabled ? 1f : 0.4f;
+        tvNextLabel.setAlpha(alpha);
+        tvNextNotification.setAlpha(alpha);
+        tvNextDate.setAlpha(alpha);
+
         List<CalendarNotification> nextGroup = CalendarAlarmScheduler.getNextGroup(this);
         if (nextGroup.isEmpty()) {
             tvNextLabel.setVisibility(View.GONE);
@@ -267,6 +295,20 @@ public class MainActivity extends AppCompatActivity {
             tvNextDate.setText(when);
             tvNextDate.setVisibility(View.VISIBLE);
         }
+    }
+
+    /**
+     * Gives a view the same colours and shape as the default Material Snackbar used by
+     * showWarning(), which blends theme colours in a way plain XML attributes can't express.
+     */
+    private void styleAsSnackbar(TextView view) {
+        int surface = MaterialColors.getColor(view, com.google.android.material.R.attr.colorSurface);
+        GradientDrawable background = new GradientDrawable();
+        background.setCornerRadius(4 * getResources().getDisplayMetrics().density);
+        background.setColor(MaterialColors.layer(view, com.google.android.material.R.attr.colorSurface,
+                com.google.android.material.R.attr.colorOnSurface, 0.8f));
+        view.setBackground(background);
+        view.setTextColor(MaterialColors.compositeARGBWithAlpha(surface, Math.round(0.87f * 255)));
     }
 
     private void showWarning(String msg) {

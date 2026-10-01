@@ -3,6 +3,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="au.bethesque.calendaralarms.MainActivity">
     <item
+        android:id="@+id/action_toggle_notifications"
+        android:icon="@drawable/volume_up_24px"
+        android:orderInCategory="90"
+        android:title="@string/action_disable_notifications"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_settings"
         android:icon="@drawable/settings_24px"
         android:orderInCategory="100"

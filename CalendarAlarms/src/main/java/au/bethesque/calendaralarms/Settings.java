@@ -138,6 +138,14 @@ public class Settings {
         put("controlPort", controlPort);
     }
 
+    public boolean isNotificationsEnabled() {
+        return getBoolean("notificationsEnabled", true);
+    }
+
+    public void setNotificationsEnabled(boolean notificationsEnabled) {
+        put("notificationsEnabled", notificationsEnabled);
+    }
+
     public String getCalendarAlarmsUrl() {
         return getString("calendarAlarmsUrl", "");
     }

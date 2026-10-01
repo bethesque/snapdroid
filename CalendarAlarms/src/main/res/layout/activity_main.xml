@@ -45,81 +45,103 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tvNextLabel"
+            android:id="@+id/tvNotificationsDisabled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="4dp"
-            android:text="@string/next_label"
-            android:textAllCaps="true"
-            android:letterSpacing="0.15"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/colorNextLabel"
-            android:textSize="32sp"
-            android:visibility="gone"
-            android:layout_marginBottom="15dp"
-             />
-
-        <TextView
-            android:id="@+id/tvNextNotification"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="4dp"
-            android:text="@string/no_upcoming_notification"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold"
-            android:textSize="40sp"
-            android:textColor="@color/colorNotificationText" />
-
-        <TextView
-            android:id="@+id/tvNextDate"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:paddingBottom="24dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold|italic"
-            android:textSize="32sp"
-            android:textColor="@color/colorNotificationText"
+            android:layout_margin="8dp"
+            android:elevation="6dp"
+            android:gravity="start|center_vertical"
+            android:minHeight="48dp"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="14dp"
+            android:text="@string/notifications_disabled_banner"
+            android:textAppearance="?attr/textAppearanceBody2"
             android:visibility="gone" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnStopPhoneAlarm"
-            android:layout_width="wrap_content"
-            android:layout_height="64dp"
-            android:layout_marginTop="30dp"
-            android:paddingHorizontal="24dp"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
             android:gravity="center"
-            android:textAllCaps="true"
-            android:textSize="21sp"
-            android:textColor="@color/colorButtonText"
-            android:text="@string/action_stop_phone_alarm"
-            app:backgroundTint="@color/colorButtonBackground"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:cornerRadius="8dp" />
+            android:orientation="vertical"
+            android:padding="24dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnStopAlarmForAll"
-            android:layout_width="wrap_content"
-            android:layout_height="64dp"
-            android:layout_marginTop="16dp"
-            android:paddingHorizontal="24dp"
-            android:gravity="center"
-            android:textAllCaps="true"
-            android:textSize="21sp"
-            android:textColor="@color/colorButtonText"
-            android:text="@string/action_stop_alarm_for_all"
-            app:backgroundTint="@color/colorButtonBackground"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:cornerRadius="8dp" />
+            <TextView
+                android:id="@+id/tvNextLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:text="@string/next_label"
+                android:textAllCaps="true"
+                android:letterSpacing="0.15"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/colorNextLabel"
+                android:textSize="32sp"
+                android:visibility="gone"
+                android:layout_marginBottom="15dp"
+                 />
+
+            <TextView
+                android:id="@+id/tvNextNotification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="4dp"
+                android:text="@string/no_upcoming_notification"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold"
+                android:textSize="40sp"
+                android:textColor="@color/colorNotificationText" />
+
+            <TextView
+                android:id="@+id/tvNextDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingBottom="24dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold|italic"
+                android:textSize="32sp"
+                android:textColor="@color/colorNotificationText"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStopPhoneAlarm"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginTop="30dp"
+                android:paddingHorizontal="24dp"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textSize="21sp"
+                android:textColor="@color/colorButtonText"
+                android:text="@string/action_stop_phone_alarm"
+                app:backgroundTint="@color/colorButtonBackground"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnStopAlarmForAll"
+                android:layout_width="wrap_content"
+                android:layout_height="64dp"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="24dp"
+                android:gravity="center"
+                android:textAllCaps="true"
+                android:textSize="21sp"
+                android:textColor="@color/colorButtonText"
+                android:text="@string/action_stop_alarm_for_all"
+                app:backgroundTint="@color/colorButtonBackground"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
