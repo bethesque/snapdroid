@@ -30,6 +30,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -133,17 +136,34 @@ public class MainActivity extends AppCompatActivity {
         tvNextNotification = findViewById(R.id.tvNextNotification);
         tvNextDate = findViewById(R.id.tvNextDate);
         btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
+        btnStopPhoneAlarm.setText(buttonText(R.string.action_stop_phone_alarm,
+                R.string.action_stop_phone_alarm_subtitle));
         btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
 
         Button btnStopAlarmForAll = findViewById(R.id.btnStopAlarmForAll);
+        btnStopAlarmForAll.setText(buttonText(R.string.action_stop_alarm_for_all,
+                R.string.action_stop_alarm_for_all_subtitle));
         btnStopAlarmForAll.setOnClickListener(v -> stopAlarmForAll());
         btnStopPhoneAlarm.post(() -> {
-            btnStopAlarmForAll.getLayoutParams().width = btnStopPhoneAlarm.getWidth();
+            int width = Math.max(btnStopPhoneAlarm.getWidth(), btnStopAlarmForAll.getWidth());
+            btnStopPhoneAlarm.getLayoutParams().width = width;
+            btnStopAlarmForAll.getLayoutParams().width = width;
+            btnStopPhoneAlarm.requestLayout();
             btnStopAlarmForAll.requestLayout();
         });
 
         askNotificationPermission();
         CalendarAlarmScheduler.schedulePeriodicRefresh(this);
+    }
+
+    private CharSequence buttonText(int titleRes, int subtitleRes) {
+        SpannableStringBuilder text =
+                new SpannableStringBuilder(getString(titleRes)).append('\n');
+        int subtitleStart = text.length();
+        text.append(getString(subtitleRes));
+        text.setSpan(new RelativeSizeSpan(0.65f), subtitleStart, text.length(),
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return text;
     }
 
     @Override

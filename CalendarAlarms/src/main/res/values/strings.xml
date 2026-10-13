@@ -4,7 +4,7 @@
     <string name="notification_title">Notification streamer</string>
     <string name="notification_text">Notification streamer is running…</string>
     <string name="notification_info">info…</string>
-    <string name="stop">stop</string>
+    <string name="stop">mute for me</string>
     <string name="menu_details">Details</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_group">Group</string>
@@ -21,10 +21,12 @@
     <string name="title_activity_logs">Logs</string>
     <string name="no_logs">No logs yet</string>
     <string name="jump_to_latest">Jump to latest</string>
-    <string name="action_stop_phone_alarm">Stop alarm on phone</string>
+    <string name="action_stop_phone_alarm">MUTE</string>
+    <string name="action_stop_phone_alarm_subtitle">alarm for me</string>
     <string name="phone_alarm_stopped">Phone alarm stopped</string>
     <string name="snapclient_not_running">Notification streamer isn\'t running on this phone</string>
-    <string name="action_stop_alarm_for_all">Stop alarm for all</string>
+    <string name="action_stop_alarm_for_all">STOP</string>
+    <string name="action_stop_alarm_for_all_subtitle">alarm for all</string>
     <string name="alarm_stopped_for_all">Alarm stopped for all players</string>
     <string name="stop_alarm_for_all_failed">Failed to stop alarm: %1$s</string>
     <string name="action_save">Save</string>
