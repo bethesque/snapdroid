@@ -144,12 +144,20 @@ public class MainActivity extends AppCompatActivity {
         btnStopAlarmForAll.setText(buttonText(R.string.action_stop_alarm_for_all,
                 R.string.action_stop_alarm_for_all_subtitle));
         btnStopAlarmForAll.setOnClickListener(v -> stopAlarmForAll());
+
+        Button btnSnoozeAlarmForAll = findViewById(R.id.btnSnoozeAlarmForAll);
+        btnSnoozeAlarmForAll.setText(buttonText(R.string.action_snooze_alarm_for_all,
+                R.string.action_snooze_alarm_for_all_subtitle));
+        btnSnoozeAlarmForAll.setOnClickListener(v -> snoozeAlarmForAll());
         btnStopPhoneAlarm.post(() -> {
-            int width = Math.max(btnStopPhoneAlarm.getWidth(), btnStopAlarmForAll.getWidth());
+            int width = Math.max(btnStopPhoneAlarm.getWidth(),
+                    Math.max(btnStopAlarmForAll.getWidth(), btnSnoozeAlarmForAll.getWidth()));
             btnStopPhoneAlarm.getLayoutParams().width = width;
             btnStopAlarmForAll.getLayoutParams().width = width;
+            btnSnoozeAlarmForAll.getLayoutParams().width = width;
             btnStopPhoneAlarm.requestLayout();
             btnStopAlarmForAll.requestLayout();
+            btnSnoozeAlarmForAll.requestLayout();
         });
 
         askNotificationPermission();
@@ -290,6 +298,17 @@ public class MainActivity extends AppCompatActivity {
         CalendarAlarmScheduler.stopOnServer(this,
                 () -> showWarning(getString(R.string.alarm_stopped_for_all)),
                 e -> showWarning(getString(R.string.stop_alarm_for_all_failed, e.getMessage())));
+    }
+
+    private void snoozeAlarmForAll() {
+        if (Settings.getInstance(this).getCalendarAlarmsUrl().trim().isEmpty()) {
+            showWarning(getString(R.string.calendar_alarms_url_empty));
+            return;
+        }
+
+        CalendarAlarmScheduler.snoozeOnServer(this,
+                () -> showWarning(getString(R.string.alarm_snoozed_for_all)),
+                e -> showWarning(getString(R.string.snooze_alarm_for_all_failed, e.getMessage())));
     }
 
     private void updateNextNotification() {

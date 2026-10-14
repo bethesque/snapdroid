@@ -141,6 +141,22 @@
                 android:insetBottom="0dp"
                 app:cornerRadius="8dp" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSnoozeAlarmForAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="64dp"
+                android:layout_marginTop="16dp"
+                android:paddingHorizontal="24dp"
+                android:gravity="center"
+                android:textAllCaps="false"
+                android:textSize="28sp"
+                android:textColor="@color/colorButtonText"
+                app:backgroundTint="@color/colorButtonBackground"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:cornerRadius="8dp" />
+
         </LinearLayout>
 
     </LinearLayout>

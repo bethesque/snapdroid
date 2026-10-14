@@ -55,6 +55,7 @@ public class CalendarAlarmScheduler {
     private static final int READ_TIMEOUT_MS = 15_000;
     private static final String NOTIFICATIONS_PATH = "/alarm/notifications";
     private static final String STOP_ALARM_PATH = "/alarm/stop";
+    private static final String SNOOZE_ALARM_PATH = "/alarm/snooze";
     private static final int SNAPSERVER_REACHABLE_TIMEOUT_MS = 3_000;
     private static final String PERIODIC_REFRESH_WORK_NAME = "calendar_refresh";
 
@@ -132,6 +133,25 @@ public class CalendarAlarmScheduler {
                 mainHandler.post(onSuccess);
             } catch (Exception e) {
                 Log.e(TAG, "stopOnServer failed", e);
+                mainHandler.post(() -> onError.accept(e));
+            }
+        }).start();
+    }
+
+    /**
+     * Posts to the Calendar Alarms URL's /alarm/snooze endpoint, telling the server to
+     * snooze the alarm for all listening clients.
+     */
+    public static void snoozeOnServer(Context context, Runnable onSuccess, Consumer<Exception> onError) {
+        Context appContext = context.getApplicationContext();
+        Handler mainHandler = new Handler(Looper.getMainLooper());
+        new Thread(() -> {
+            try {
+                String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
+                post(baseUrl.replaceAll("/+$", "") + SNOOZE_ALARM_PATH);
+                mainHandler.post(onSuccess);
+            } catch (Exception e) {
+                Log.e(TAG, "snoozeOnServer failed", e);
                 mainHandler.post(() -> onError.accept(e));
             }
         }).start();
