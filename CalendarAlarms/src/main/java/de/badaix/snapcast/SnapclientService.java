@@ -40,7 +40,6 @@ import android.os.IBinder;
 import android.os.PowerManager;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.TaskStackBuilder;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,6 +48,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import au.bethesque.calendaralarms.utils.Log;
+import au.bethesque.calendaralarms.MainActivity;
 import au.bethesque.calendaralarms.Settings;
 
 /**
@@ -134,22 +134,11 @@ public class SnapclientService extends Service {
                             .setStyle(new NotificationCompat.BigTextStyle().bigText(getText(R.string.notification_text)))
                             .addAction(R.drawable.ic_media_stop, getString(R.string.stop), piStop);
 
-            Intent resultIntent = new Intent(this, SnapclientActivity.class);
-
-            // The stack builder object will contain an artificial back stack for the
-            // started Activity.
-            // This ensures that navigating backward from the Activity leads out of
-            // your application to the Home screen.
-            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-            // Adds the back stack for the Intent (but not the Intent itself)
-            stackBuilder.addParentStack(SnapclientActivity.class);
-            // Adds the Intent that starts the Activity to the top of the stack
-            stackBuilder.addNextIntent(resultIntent);
-            PendingIntent resultPendingIntent =
-                    stackBuilder.getPendingIntent(
-                            0,
-                            PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-                    );
+            // MainActivity is the root, so reuse the existing instance rather than stacking a new one
+            Intent resultIntent = new Intent(this, MainActivity.class);
+            resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent resultPendingIntent = PendingIntent.getActivity(this, 0, resultIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
             builder.setContentIntent(resultPendingIntent);
             // mId allows you to update the notification later on.
             final Notification notification = builder.build();
