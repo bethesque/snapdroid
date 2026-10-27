@@ -33,11 +33,16 @@ import de.badaix.snapcast.R;
 
 public class ServerSettingsActivity extends AppCompatActivity {
 
+    private static final String DEV_CALENDAR_ALARMS_URL = "http://192.168.20.35:8081";
+    private static final String PROD_CALENDAR_ALARMS_URL = "http://nas.dixon.net.au:8442";
+
     private EditText editHost;
     private EditText editStreamPort;
     private EditText editControlPort;
     private EditText editCalendarAlarmsUrl;
     private EditText editCalendarRefreshIntervalMinutes;
+    private CheckBox checkBoxCalendarAlarmsDev;
+    private CheckBox checkBoxSnapclientEnabled;
     private CheckBox checkBoxResample;
     private Spinner spinnerAudioEngine;
 
@@ -51,11 +56,13 @@ public class ServerSettingsActivity extends AppCompatActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
+        checkBoxSnapclientEnabled = findViewById(R.id.snapclient_enabled);
         editHost = findViewById(R.id.host);
         editStreamPort = findViewById(R.id.stream_port);
         editControlPort = findViewById(R.id.control_port);
         editCalendarAlarmsUrl = findViewById(R.id.calendar_alarms_url);
         editCalendarRefreshIntervalMinutes = findViewById(R.id.calendar_refresh_interval_minutes);
+        checkBoxCalendarAlarmsDev = findViewById(R.id.calendar_alarms_dev);
 
         spinnerAudioEngine = findViewById(R.id.audio_engine);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -65,10 +72,15 @@ public class ServerSettingsActivity extends AppCompatActivity {
         checkBoxResample = findViewById(R.id.checkBoxResample);
 
         loadSettings();
+
+        // Attached after loadSettings so restoring the checkbox state doesn't overwrite the URL.
+        checkBoxCalendarAlarmsDev.setOnCheckedChangeListener((buttonView, isChecked) ->
+                editCalendarAlarmsUrl.setText(isChecked ? DEV_CALENDAR_ALARMS_URL : PROD_CALENDAR_ALARMS_URL));
     }
 
     private void loadSettings() {
         Settings settings = Settings.getInstance(this);
+        checkBoxSnapclientEnabled.setChecked(settings.isSnapclientEnabled());
         editHost.setText(settings.getHost());
         editStreamPort.setText(Integer.toString(settings.getStreamPort()));
         editControlPort.setText(Integer.toString(settings.getControlPort()));
@@ -80,6 +92,7 @@ public class ServerSettingsActivity extends AppCompatActivity {
         }
         checkBoxResample.setChecked(settings.doResample());
         editCalendarAlarmsUrl.setText(settings.getCalendarAlarmsUrl());
+        checkBoxCalendarAlarmsDev.setChecked(DEV_CALENDAR_ALARMS_URL.equals(settings.getCalendarAlarmsUrl()));
         editCalendarRefreshIntervalMinutes.setText(Integer.toString(settings.getCalendarRefreshIntervalMinutes()));
     }
 
@@ -112,6 +125,7 @@ public class ServerSettingsActivity extends AppCompatActivity {
         }
 
         Settings settings = Settings.getInstance(this);
+        settings.setSnapclientEnabled(checkBoxSnapclientEnabled.isChecked());
         settings.setHost(host, streamPort, controlPort);
         settings.setAudioEngine(spinnerAudioEngine.getSelectedItem().toString(), checkBoxResample.isChecked());
         settings.setCalendarAlarmsUrl(editCalendarAlarmsUrl.getText().toString());

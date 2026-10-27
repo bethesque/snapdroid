@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <application
         android:name=".SnapcastApplication"
@@ -70,6 +71,11 @@
         <receiver
             android:name="au.bethesque.calendaralarms.CalendarAlarmReceiver"
             android:exported="false" />
+
+        <service
+            android:name="au.bethesque.calendaralarms.OfflineAlarmService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
 
         <!-- android:theme="@style/Theme.AppCompat.Light.DialogWhenLarge" -->
         <activity

@@ -138,6 +138,14 @@ public class Settings {
         put("controlPort", controlPort);
     }
 
+    public boolean isSnapclientEnabled() {
+        return getBoolean("snapclientEnabled", true);
+    }
+
+    public void setSnapclientEnabled(boolean snapclientEnabled) {
+        put("snapclientEnabled", snapclientEnabled);
+    }
+
     public boolean isNotificationsEnabled() {
         return getBoolean("notificationsEnabled", true);
     }

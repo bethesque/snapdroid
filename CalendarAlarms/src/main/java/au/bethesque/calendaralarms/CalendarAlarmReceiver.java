@@ -30,12 +30,16 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
                         // being refreshed and the next occurrence re-armed as normal.
                         Log.i(TAG, "onReceive: notifications disabled, not playing this occurrence");
                         CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
-                    } else if (CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
+                    } else if (CalendarAlarmScheduler.isSnapclientEnabled(appContext)
+                            && CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
                         BroadcastReceiver.startService(appContext, SnapclientService.ACTION_START);
                         CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
                     } else {
-                        Log.i(TAG, "onReceive: snapserver unreachable (not on home network?), skipping this occurrence");
-                        CalendarAlarmScheduler.scheduleNext(appContext);
+                        Log.i(TAG, "onReceive: snapclient disabled or snapserver unreachable (not on home network?), playing downloaded audio instead");
+                        CalendarAlarmScheduler.scheduleOfflinePlayback(appContext);
+                        // Re-arm via the stop alarm, as scheduleNext would re-fire immediately
+                        // while this occurrence's play_datetime is still in the future.
+                        CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
                     }
                 } finally {
                     pendingResult.finish();

@@ -4,6 +4,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -14,9 +16,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -50,6 +55,9 @@ public class CalendarAlarmScheduler {
 
     private static final int REQUEST_CODE_ALARM_START = 2001;
     private static final int REQUEST_CODE_ALARM_STOP = 2002;
+    private static final int REQUEST_CODE_OFFLINE_PLAY = 2003;
+    private static final int REQUEST_CODE_OFFLINE_SHOW = 2004;
+    private static final String TYPE_ANNOUNCE = "announce";
     private static final long LEAD_TIME_MS = 45_000L;
     private static final int CONNECT_TIMEOUT_MS = 10_000;
     private static final int READ_TIMEOUT_MS = 15_000;
@@ -58,6 +66,7 @@ public class CalendarAlarmScheduler {
     private static final String SNOOZE_ALARM_PATH = "/alarm/snooze";
     private static final int SNAPSERVER_REACHABLE_TIMEOUT_MS = 3_000;
     private static final String PERIODIC_REFRESH_WORK_NAME = "calendar_refresh";
+    private static final String AUDIO_DIR = "audio";
 
     /**
      * WorkManager silently refuses to run PeriodicWorkRequests more often than this, so
@@ -94,6 +103,79 @@ public class CalendarAlarmScheduler {
         // Sanity-parse before persisting so garbage never overwrites a working schedule.
         new JSONObject(body);
         Settings.getInstance(appContext).setCalendarNotificationsJson(body);
+        Log.i(TAG, "fetchAndStoreSync: refreshed " + loadStored(appContext).size() + " events from " + baseUrl);
+        downloadAudioFiles(appContext);
+    }
+
+    /**
+     * Downloads each stored notification's audio_file_url into local storage, so it can be
+     * played later when the snapserver is unreachable. Failures are logged rather than
+     * thrown so a missing audio file never blocks the schedule from updating.
+     */
+    private static void downloadAudioFiles(Context context) {
+        for (CalendarNotification notification : loadStored(context)) {
+            String audioFileUrl = notification.getAudioFileUrl();
+            if (audioFileUrl.isEmpty())
+                continue;
+
+            try {
+                downloadAudioFile(context, audioFileUrl);
+            } catch (IOException e) {
+                Log.w(TAG, "downloadAudioFiles: failed to download " + audioFileUrl, e);
+            }
+        }
+    }
+
+    /**
+     * Returns the local file an audio_file_url is (or will be) downloaded to.
+     */
+    public static File getLocalAudioFile(Context context, String audioFileUrl) {
+        String name = Uri.parse(audioFileUrl).getLastPathSegment();
+        return new File(new File(context.getFilesDir(), AUDIO_DIR), name);
+    }
+
+    private static void downloadAudioFile(Context context, String audioFileUrl) throws IOException {
+        File target = getLocalAudioFile(context, audioFileUrl);
+        // Spike: the audio URL is currently static, so an existing file is assumed current.
+        if (target.exists()) {
+            Log.d(TAG, "downloadAudioFile: " + target + " already exists, skipping " + audioFileUrl);
+            return;
+        }
+
+        URL url = new URL(audioFileUrl);
+        File dir = target.getParentFile();
+        if (!dir.isDirectory() && !dir.mkdirs())
+            throw new IOException("Could not create " + dir);
+        // Download to a temp file first so an interrupted download never looks complete.
+        File tmp = new File(target.getPath() + ".tmp");
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        try {
+            connection.setRequestMethod("GET");
+            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
+            connection.setReadTimeout(READ_TIMEOUT_MS);
+
+            int responseCode = connection.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK) {
+                throw new IOException("Unexpected HTTP response code: " + responseCode);
+            }
+
+            try (InputStream is = connection.getInputStream();
+                 OutputStream os = new FileOutputStream(tmp)) {
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = is.read(buffer)) != -1) {
+                    os.write(buffer, 0, read);
+                }
+            }
+            if (!tmp.renameTo(target)) {
+                throw new IOException("Could not rename " + tmp + " to " + target);
+            }
+            Log.d(TAG, "downloadAudioFile: downloaded " + url + " to " + target);
+        } finally {
+            connection.disconnect();
+            tmp.delete();
+        }
     }
 
     /**
@@ -221,6 +303,10 @@ public class CalendarAlarmScheduler {
         return notifications;
     }
 
+    public static boolean isSnapclientEnabled(Context context) {
+        return Settings.getInstance(context).isSnapclientEnabled();
+    }
+
     /**
      * Checks whether the snapserver's control port can be reached right now, used as a
      * proxy for "connected to the home network" without needing SSID/location permissions.
@@ -344,6 +430,60 @@ public class CalendarAlarmScheduler {
         }
     }
 
+    /**
+     * Schedules an alarm clock at the next play_datetime that plays each of that occurrence's
+     * downloaded audio files once through OfflineAlarmService, announcements first. A
+     * notification whose audio file hasn't been downloaded plays the default alarm sound.
+     */
+    public static void scheduleOfflinePlayback(Context context) {
+        List<CalendarNotification> group = getNextGroup(context);
+        if (group.isEmpty())
+            return;
+
+        List<CalendarNotification> ordered = new ArrayList<>();
+        for (CalendarNotification notification : group) {
+            if (TYPE_ANNOUNCE.equals(notification.getType()))
+                ordered.add(notification);
+        }
+        for (CalendarNotification notification : group) {
+            if (!TYPE_ANNOUNCE.equals(notification.getType()))
+                ordered.add(notification);
+        }
+
+        ArrayList<String> audioUris = new ArrayList<>();
+        List<String> summaries = new ArrayList<>();
+        for (CalendarNotification notification : ordered) {
+            summaries.add(notification.getSummary());
+            Uri audioUri = null;
+            if (!notification.getAudioFileUrl().isEmpty()) {
+                File audioFile = getLocalAudioFile(context, notification.getAudioFileUrl());
+                if (audioFile.exists())
+                    audioUri = Uri.fromFile(audioFile);
+            }
+            if (audioUri == null) {
+                Log.w(TAG, "scheduleOfflinePlayback: no audio file for \"" + notification.getSummary() + "\", using default alarm sound");
+                audioUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            }
+            if (audioUri != null)
+                audioUris.add(audioUri.toString());
+        }
+
+        Intent intent = new Intent(context, OfflineAlarmService.class);
+        intent.setAction(OfflineAlarmService.ACTION_PLAY);
+        intent.putStringArrayListExtra(OfflineAlarmService.EXTRA_AUDIO_URIS, audioUris);
+        intent.putExtra(OfflineAlarmService.EXTRA_TITLE, String.join(", ", summaries));
+
+        long triggerAtMillis = ordered.get(0).getPlayDateTime().toInstant().toEpochMilli();
+        Log.i(TAG, "scheduleOfflinePlayback: playing " + audioUris + " at " + ordered.get(0).getPlayDateTime());
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        try {
+            alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(triggerAtMillis, buildOfflineShowPendingIntent(context)),
+                    buildOfflinePlayPendingIntent(context, intent));
+        } catch (SecurityException e) {
+            Log.w(TAG, "scheduleOfflinePlayback: exact alarm permission revoked", e);
+        }
+    }
+
     private static void setExactAlarm(AlarmManager alarmManager, int type, long triggerAtMillis, PendingIntent pendingIntent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             alarmManager.setExactAndAllowWhileIdle(type, triggerAtMillis, pendingIntent);
@@ -356,6 +496,23 @@ public class CalendarAlarmScheduler {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(buildStartPendingIntent(context));
         alarmManager.cancel(buildStopPendingIntent(context));
+        alarmManager.cancel(buildOfflinePlayPendingIntent(context, new Intent(context, OfflineAlarmService.class)
+                .setAction(OfflineAlarmService.ACTION_PLAY)));
+    }
+
+    private static PendingIntent buildOfflinePlayPendingIntent(Context context, Intent intent) {
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            return PendingIntent.getForegroundService(context, REQUEST_CODE_OFFLINE_PLAY, intent, flags);
+        }
+        return PendingIntent.getService(context, REQUEST_CODE_OFFLINE_PLAY, intent, flags);
+    }
+
+    private static PendingIntent buildOfflineShowPendingIntent(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        return PendingIntent.getActivity(context, REQUEST_CODE_OFFLINE_SHOW, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     private static PendingIntent buildStartPendingIntent(Context context) {

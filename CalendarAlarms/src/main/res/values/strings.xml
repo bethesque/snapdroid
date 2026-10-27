@@ -33,6 +33,10 @@
     <string name="action_snooze_alarm_for_all_subtitle">alarm for all</string>
     <string name="alarm_snoozed_for_all">Alarm snoozed for all players</string>
     <string name="snooze_alarm_for_all_failed">Failed to snooze alarm: %1$s</string>
+    <string name="offline_alarm_channel_name">Alarms</string>
+    <string name="offline_alarm_channel_description">Plays calendar alarms when the Snapcast server can\'t be reached</string>
+    <string name="offline_alarm_text">Playing alarm</string>
+    <string name="offline_alarm_stop">Stop</string>
     <string name="action_save">Save</string>
     <string name="action_bar_failed">Cannot set ActionBar!</string>
 
@@ -66,11 +70,13 @@
     <string name="notifications_disabled_banner">Notifications muted</string>
     <string name="action_enable_notifications">Unmute notifications</string>
     <string name="action_disable_notifications">Mute notifications</string>
+    <string name="snapclient_enabled">Enabled</string>
     <string name="host">Host</string>
     <string name="streaming_port">stream port</string>
     <string name="control_port">control port</string>
     <string name="calendar_alarms_url">URL</string>
     <string name="calendar_alarms_url_hint">http://host:port</string>
+    <string name="calendar_alarms_dev">Dev</string>
     <string name="calendar_refresh_interval_minutes">Refresh interval (minutes)</string>
     <string name="calendar_refresh_interval_too_low">Refresh interval must be at least %1$d minutes</string>
     <string name="settings">Settings</string>
