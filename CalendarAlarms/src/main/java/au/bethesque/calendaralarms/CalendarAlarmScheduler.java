@@ -368,17 +368,23 @@ public class CalendarAlarmScheduler {
 
         ArrayList<String> announcements = new ArrayList<>();
         ArrayList<String> alarms = new ArrayList<>();
+        List<String> announcementSummaries = new ArrayList<>();
+        List<String> alarmSummaries = new ArrayList<>();
         long maxDurationSeconds = 0;
         for (CalendarNotification notification : group) {
-            if (TYPE_ANNOUNCE.equals(notification.getType()))
-                announcements.add(notification.getSummary());
-            else
-                alarms.add(notification.getSummary());
+            String spokenText = notification.getSpokenText(notification.getPlayDateTime());
+            if (TYPE_ANNOUNCE.equals(notification.getType())) {
+                announcements.add(spokenText);
+                announcementSummaries.add(notification.getSummary());
+            } else {
+                alarms.add(spokenText);
+                alarmSummaries.add(notification.getSummary());
+            }
             maxDurationSeconds = Math.max(maxDurationSeconds, notification.getDurationSeconds());
         }
 
-        List<String> summaries = new ArrayList<>(announcements);
-        summaries.addAll(alarms);
+        List<String> summaries = new ArrayList<>(announcementSummaries);
+        summaries.addAll(alarmSummaries);
 
         Intent intent = new Intent(context, OfflineAlarmService.class);
         intent.setAction(OfflineAlarmService.ACTION_PLAY);
