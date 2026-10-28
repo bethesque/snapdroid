@@ -27,6 +27,17 @@ import android.preference.PreferenceManager;
  * Created by johannes on 21.02.16.
  */
 public class Settings {
+    public static final String KEY_ALARM_MODE = "alarmMode";
+
+    /**
+     * How the current calendar alarm is being played, decided at the pre-alarm check.
+     */
+    public enum AlarmMode {
+        NONE,
+        SNAPSERVER,
+        OFFLINE
+    }
+
     private static Settings instance = null;
     private Context ctx = null;
 
@@ -176,5 +187,37 @@ public class Settings {
 
     public void setCalendarRefreshIntervalMinutes(int calendarRefreshIntervalMinutes) {
         put("calendarRefreshIntervalMinutes", calendarRefreshIntervalMinutes);
+    }
+
+    public AlarmMode getAlarmMode() {
+        try {
+            return AlarmMode.valueOf(getString(KEY_ALARM_MODE, AlarmMode.NONE.name()));
+        } catch (IllegalArgumentException e) {
+            return AlarmMode.NONE;
+        }
+    }
+
+    public void setAlarmMode(AlarmMode alarmMode) {
+        put(KEY_ALARM_MODE, alarmMode.name());
+    }
+
+    /**
+     * The play_datetime (epoch millis) of the most recently scheduled offline alarm, or 0.
+     */
+    public long getOfflineAlarmPlayMillis() {
+        return getLong("offlineAlarmPlayMillis", 0);
+    }
+
+    public void setOfflineAlarmPlayMillis(long offlineAlarmPlayMillis) {
+        put("offlineAlarmPlayMillis", offlineAlarmPlayMillis);
+    }
+
+    /**
+     * Sets the alarm mode back to NONE, but only if it's still the given mode, so that a
+     * late stop from one mode can't clear an alarm that's since started in the other.
+     */
+    public void clearAlarmMode(AlarmMode alarmMode) {
+        if (getAlarmMode() == alarmMode)
+            setAlarmMode(AlarmMode.NONE);
     }
 }

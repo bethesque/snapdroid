@@ -25,6 +25,8 @@
     <string name="action_stop_phone_alarm_subtitle">alarm for me</string>
     <string name="phone_alarm_stopped">Phone alarm stopped</string>
     <string name="snapclient_not_running">Notification streamer isn\'t running on this phone</string>
+    <string name="action_stop_offline_alarm">STOP</string>
+    <string name="offline_alarm_stopped">Alarm stopped</string>
     <string name="action_stop_alarm_for_all">STOP</string>
     <string name="action_stop_alarm_for_all_subtitle">alarm for all</string>
     <string name="alarm_stopped_for_all">Alarm stopped for all players</string>

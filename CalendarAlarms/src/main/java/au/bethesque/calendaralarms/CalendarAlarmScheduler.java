@@ -4,8 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,12 +14,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -66,7 +61,6 @@ public class CalendarAlarmScheduler {
     private static final String SNOOZE_ALARM_PATH = "/alarm/snooze";
     private static final int SNAPSERVER_REACHABLE_TIMEOUT_MS = 3_000;
     private static final String PERIODIC_REFRESH_WORK_NAME = "calendar_refresh";
-    private static final String AUDIO_DIR = "audio";
 
     /**
      * WorkManager silently refuses to run PeriodicWorkRequests more often than this, so
@@ -104,78 +98,6 @@ public class CalendarAlarmScheduler {
         new JSONObject(body);
         Settings.getInstance(appContext).setCalendarNotificationsJson(body);
         Log.i(TAG, "fetchAndStoreSync: refreshed " + loadStored(appContext).size() + " events from " + baseUrl);
-        downloadAudioFiles(appContext);
-    }
-
-    /**
-     * Downloads each stored notification's audio_file_url into local storage, so it can be
-     * played later when the snapserver is unreachable. Failures are logged rather than
-     * thrown so a missing audio file never blocks the schedule from updating.
-     */
-    private static void downloadAudioFiles(Context context) {
-        for (CalendarNotification notification : loadStored(context)) {
-            String audioFileUrl = notification.getAudioFileUrl();
-            if (audioFileUrl.isEmpty())
-                continue;
-
-            try {
-                downloadAudioFile(context, audioFileUrl);
-            } catch (IOException e) {
-                Log.w(TAG, "downloadAudioFiles: failed to download " + audioFileUrl, e);
-            }
-        }
-    }
-
-    /**
-     * Returns the local file an audio_file_url is (or will be) downloaded to.
-     */
-    public static File getLocalAudioFile(Context context, String audioFileUrl) {
-        String name = Uri.parse(audioFileUrl).getLastPathSegment();
-        return new File(new File(context.getFilesDir(), AUDIO_DIR), name);
-    }
-
-    private static void downloadAudioFile(Context context, String audioFileUrl) throws IOException {
-        File target = getLocalAudioFile(context, audioFileUrl);
-        // Spike: the audio URL is currently static, so an existing file is assumed current.
-        if (target.exists()) {
-            Log.d(TAG, "downloadAudioFile: " + target + " already exists, skipping " + audioFileUrl);
-            return;
-        }
-
-        URL url = new URL(audioFileUrl);
-        File dir = target.getParentFile();
-        if (!dir.isDirectory() && !dir.mkdirs())
-            throw new IOException("Could not create " + dir);
-        // Download to a temp file first so an interrupted download never looks complete.
-        File tmp = new File(target.getPath() + ".tmp");
-
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        try {
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(CONNECT_TIMEOUT_MS);
-            connection.setReadTimeout(READ_TIMEOUT_MS);
-
-            int responseCode = connection.getResponseCode();
-            if (responseCode != HttpURLConnection.HTTP_OK) {
-                throw new IOException("Unexpected HTTP response code: " + responseCode);
-            }
-
-            try (InputStream is = connection.getInputStream();
-                 OutputStream os = new FileOutputStream(tmp)) {
-                byte[] buffer = new byte[8192];
-                int read;
-                while ((read = is.read(buffer)) != -1) {
-                    os.write(buffer, 0, read);
-                }
-            }
-            if (!tmp.renameTo(target)) {
-                throw new IOException("Could not rename " + tmp + " to " + target);
-            }
-            Log.d(TAG, "downloadAudioFile: downloaded " + url + " to " + target);
-        } finally {
-            connection.disconnect();
-            tmp.delete();
-        }
     }
 
     /**
@@ -331,11 +253,18 @@ public class CalendarAlarmScheduler {
      * the stored feed has no entries left in the future.
      */
     public static CalendarNotification getNext(Context context) {
-        Instant now = Instant.now();
+        return getNext(context, Instant.now());
+    }
+
+    /**
+     * Returns the notification with the earliest play_datetime after the given instant, or
+     * null if there is none.
+     */
+    public static CalendarNotification getNext(Context context, Instant after) {
         CalendarNotification next = null;
         for (CalendarNotification notification : loadStored(context)) {
             Instant playInstant = notification.getPlayDateTime().toInstant();
-            if (playInstant.isAfter(now) && (next == null || playInstant.isBefore(next.getPlayDateTime().toInstant()))) {
+            if (playInstant.isAfter(after) && (next == null || playInstant.isBefore(next.getPlayDateTime().toInstant()))) {
                 next = notification;
             }
         }
@@ -348,8 +277,15 @@ public class CalendarAlarmScheduler {
      * same play time), or an empty list if there's nothing upcoming.
      */
     public static List<CalendarNotification> getNextGroup(Context context) {
+        return getNextGroup(context, Instant.now());
+    }
+
+    /**
+     * Like getNextGroup(Context), but for the earliest play_datetime after the given instant.
+     */
+    public static List<CalendarNotification> getNextGroup(Context context, Instant after) {
         List<CalendarNotification> group = new ArrayList<>();
-        CalendarNotification next = getNext(context);
+        CalendarNotification next = getNext(context, after);
         if (next == null)
             return group;
 
@@ -408,16 +344,6 @@ public class CalendarAlarmScheduler {
         return true;
     }
 
-    /**
-     * Cancels the pending stop alarm for the currently playing occurrence (if any) without
-     * touching the next scheduled start, since scheduleNext already excludes occurrences
-     * whose play_datetime has passed.
-     */
-    public static void cancelStop(Context context) {
-        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(buildStopPendingIntent(context));
-    }
-
     public static void scheduleStop(Context context, long durationMillis) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent stopPendingIntent = buildStopPendingIntent(context);
@@ -431,57 +357,53 @@ public class CalendarAlarmScheduler {
     }
 
     /**
-     * Schedules an alarm clock at the next play_datetime that plays each of that occurrence's
-     * downloaded audio files once through OfflineAlarmService, announcements first. A
-     * notification whose audio file hasn't been downloaded plays the default alarm sound.
+     * Schedules an alarm clock at the next play_datetime that has OfflineAlarmService speak
+     * that occurrence's announcement and alarm event names, stopping after the longest
+     * duration_seconds in the group. Returns true if the playback was scheduled.
      */
-    public static void scheduleOfflinePlayback(Context context) {
+    public static boolean scheduleOfflinePlayback(Context context) {
         List<CalendarNotification> group = getNextGroup(context);
         if (group.isEmpty())
-            return;
+            return false;
 
-        List<CalendarNotification> ordered = new ArrayList<>();
+        ArrayList<String> announcements = new ArrayList<>();
+        ArrayList<String> alarms = new ArrayList<>();
+        long maxDurationSeconds = 0;
         for (CalendarNotification notification : group) {
             if (TYPE_ANNOUNCE.equals(notification.getType()))
-                ordered.add(notification);
-        }
-        for (CalendarNotification notification : group) {
-            if (!TYPE_ANNOUNCE.equals(notification.getType()))
-                ordered.add(notification);
+                announcements.add(notification.getSummary());
+            else
+                alarms.add(notification.getSummary());
+            maxDurationSeconds = Math.max(maxDurationSeconds, notification.getDurationSeconds());
         }
 
-        ArrayList<String> audioUris = new ArrayList<>();
-        List<String> summaries = new ArrayList<>();
-        for (CalendarNotification notification : ordered) {
-            summaries.add(notification.getSummary());
-            Uri audioUri = null;
-            if (!notification.getAudioFileUrl().isEmpty()) {
-                File audioFile = getLocalAudioFile(context, notification.getAudioFileUrl());
-                if (audioFile.exists())
-                    audioUri = Uri.fromFile(audioFile);
-            }
-            if (audioUri == null) {
-                Log.w(TAG, "scheduleOfflinePlayback: no audio file for \"" + notification.getSummary() + "\", using default alarm sound");
-                audioUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            }
-            if (audioUri != null)
-                audioUris.add(audioUri.toString());
-        }
+        List<String> summaries = new ArrayList<>(announcements);
+        summaries.addAll(alarms);
 
         Intent intent = new Intent(context, OfflineAlarmService.class);
         intent.setAction(OfflineAlarmService.ACTION_PLAY);
-        intent.putStringArrayListExtra(OfflineAlarmService.EXTRA_AUDIO_URIS, audioUris);
+        intent.putStringArrayListExtra(OfflineAlarmService.EXTRA_ANNOUNCEMENTS, announcements);
+        intent.putStringArrayListExtra(OfflineAlarmService.EXTRA_ALARMS, alarms);
+        intent.putExtra(OfflineAlarmService.EXTRA_DURATION_MILLIS, maxDurationSeconds * 1000L);
         intent.putExtra(OfflineAlarmService.EXTRA_TITLE, String.join(", ", summaries));
 
-        long triggerAtMillis = ordered.get(0).getPlayDateTime().toInstant().toEpochMilli();
-        Log.i(TAG, "scheduleOfflinePlayback: playing " + audioUris + " at " + ordered.get(0).getPlayDateTime());
+        long triggerAtMillis = group.get(0).getPlayDateTime().toInstant().toEpochMilli();
+        Log.i(TAG, "scheduleOfflinePlayback: announcements " + announcements + ", alarms " + alarms + " at " + group.get(0).getPlayDateTime());
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         try {
             alarmManager.setAlarmClock(new AlarmManager.AlarmClockInfo(triggerAtMillis, buildOfflineShowPendingIntent(context)),
                     buildOfflinePlayPendingIntent(context, intent));
+            return true;
         } catch (SecurityException e) {
             Log.w(TAG, "scheduleOfflinePlayback: exact alarm permission revoked", e);
+            return false;
         }
+    }
+
+    public static void cancelOfflinePlayback(Context context) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.cancel(buildOfflinePlayPendingIntent(context, new Intent(context, OfflineAlarmService.class)
+                .setAction(OfflineAlarmService.ACTION_PLAY)));
     }
 
     private static void setExactAlarm(AlarmManager alarmManager, int type, long triggerAtMillis, PendingIntent pendingIntent) {
@@ -496,8 +418,7 @@ public class CalendarAlarmScheduler {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.cancel(buildStartPendingIntent(context));
         alarmManager.cancel(buildStopPendingIntent(context));
-        alarmManager.cancel(buildOfflinePlayPendingIntent(context, new Intent(context, OfflineAlarmService.class)
-                .setAction(OfflineAlarmService.ACTION_PLAY)));
+        cancelOfflinePlayback(context);
     }
 
     private static PendingIntent buildOfflinePlayPendingIntent(Context context, Intent intent) {

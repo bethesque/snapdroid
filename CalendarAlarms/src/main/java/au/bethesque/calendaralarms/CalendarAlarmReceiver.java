@@ -30,16 +30,17 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
                         // being refreshed and the next occurrence re-armed as normal.
                         Log.i(TAG, "onReceive: notifications disabled, not playing this occurrence");
                         CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
-                    } else if (CalendarAlarmScheduler.isSnapclientEnabled(appContext)
-                            && CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
+                    } else if (!CalendarAlarmScheduler.isSnapclientEnabled(appContext)) {
+                        // Checked before reachability so a disabled snapclient never touches the network
+                        Log.i(TAG, "onReceive: snapclient disabled, playing offline alarm");
+                        playOffline(appContext);
+                    } else if (CalendarAlarmScheduler.isSnapserverReachable(appContext)) {
+                        Settings.getInstance(appContext).setAlarmMode(Settings.AlarmMode.SNAPSERVER);
                         BroadcastReceiver.startService(appContext, SnapclientService.ACTION_START);
                         CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
                     } else {
-                        Log.i(TAG, "onReceive: snapclient disabled or snapserver unreachable (not on home network?), playing downloaded audio instead");
-                        CalendarAlarmScheduler.scheduleOfflinePlayback(appContext);
-                        // Re-arm via the stop alarm, as scheduleNext would re-fire immediately
-                        // while this occurrence's play_datetime is still in the future.
-                        CalendarAlarmScheduler.scheduleStop(appContext, CalendarAlarmScheduler.getNextPlayDurationMillis(appContext));
+                        Log.i(TAG, "onReceive: snapserver unreachable (not on home network?), playing offline alarm");
+                        playOffline(appContext);
                     }
                 } finally {
                     pendingResult.finish();
@@ -47,6 +48,8 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
             }).start();
         } else if (ACTION_ALARM_STOP.equals(action)) {
             BroadcastReceiver.startService(context, SnapclientService.ACTION_STOP);
+            // Offline mode is cleared by OfflineAlarmService when its playback stops
+            Settings.getInstance(context).clearAlarmMode(Settings.AlarmMode.SNAPSERVER);
             android.content.BroadcastReceiver.PendingResult pendingResult = goAsync();
             Context appContext = context.getApplicationContext();
             new Thread(() -> {
@@ -63,5 +66,18 @@ public class CalendarAlarmReceiver extends android.content.BroadcastReceiver {
                 }
             }).start();
         }
+    }
+
+    private static void playOffline(Context context) {
+        CalendarNotification next = CalendarAlarmScheduler.getNext(context);
+        if (CalendarAlarmScheduler.scheduleOfflinePlayback(context)) {
+            Settings settings = Settings.getInstance(context);
+            // Set before the mode, as the main page reads it when the mode changes
+            settings.setOfflineAlarmPlayMillis(next.getPlayDateTime().toInstant().toEpochMilli());
+            settings.setAlarmMode(Settings.AlarmMode.OFFLINE);
+        }
+        // Re-arm via the stop alarm, as scheduleNext would re-fire immediately
+        // while this occurrence's play_datetime is still in the future.
+        CalendarAlarmScheduler.scheduleStop(context, CalendarAlarmScheduler.getNextPlayDurationMillis(context));
     }
 }

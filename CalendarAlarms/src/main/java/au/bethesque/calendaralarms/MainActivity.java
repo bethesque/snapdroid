@@ -24,6 +24,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -51,9 +52,11 @@ import androidx.core.content.ContextCompat;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.snackbar.Snackbar;
 
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -79,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvNextNotification;
     private TextView tvNextDate;
     private Button btnStopPhoneAlarm;
+    private Button btnStopAlarmForAll;
+    private Button btnSnoozeAlarmForAll;
 
     private boolean serviceBound = false;
     private SnapclientService snapclientService;
@@ -94,6 +99,15 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName name) {
             serviceBound = false;
             snapclientService = null;
+        }
+    };
+
+    // Held in a field because SharedPreferences only keeps a weak reference to listeners
+    private final SharedPreferences.OnSharedPreferenceChangeListener alarmModeListener = (prefs, key) -> {
+        if (Settings.KEY_ALARM_MODE.equals(key)) {
+            updateButtons();
+            // The alarm that just finished may still have been showing as the next event
+            updateNextNotification();
         }
     };
 
@@ -136,29 +150,22 @@ public class MainActivity extends AppCompatActivity {
         tvNextNotification = findViewById(R.id.tvNextNotification);
         tvNextDate = findViewById(R.id.tvNextDate);
         btnStopPhoneAlarm = findViewById(R.id.btnStopPhoneAlarm);
-        btnStopPhoneAlarm.setText(buttonText(R.string.action_stop_phone_alarm,
-                R.string.action_stop_phone_alarm_subtitle));
-        btnStopPhoneAlarm.setOnClickListener(v -> stopPhoneAlarm());
+        btnStopPhoneAlarm.setOnClickListener(v -> {
+            if (Settings.getInstance(this).getAlarmMode() == Settings.AlarmMode.OFFLINE)
+                stopOfflineAlarm();
+            else
+                stopPhoneAlarm();
+        });
 
-        Button btnStopAlarmForAll = findViewById(R.id.btnStopAlarmForAll);
+        btnStopAlarmForAll = findViewById(R.id.btnStopAlarmForAll);
         btnStopAlarmForAll.setText(buttonText(R.string.action_stop_alarm_for_all,
                 R.string.action_stop_alarm_for_all_subtitle));
         btnStopAlarmForAll.setOnClickListener(v -> stopAlarmForAll());
 
-        Button btnSnoozeAlarmForAll = findViewById(R.id.btnSnoozeAlarmForAll);
+        btnSnoozeAlarmForAll = findViewById(R.id.btnSnoozeAlarmForAll);
         btnSnoozeAlarmForAll.setText(buttonText(R.string.action_snooze_alarm_for_all,
                 R.string.action_snooze_alarm_for_all_subtitle));
         btnSnoozeAlarmForAll.setOnClickListener(v -> snoozeAlarmForAll());
-        btnStopPhoneAlarm.post(() -> {
-            int width = Math.max(btnStopPhoneAlarm.getWidth(),
-                    Math.max(btnStopAlarmForAll.getWidth(), btnSnoozeAlarmForAll.getWidth()));
-            btnStopPhoneAlarm.getLayoutParams().width = width;
-            btnStopAlarmForAll.getLayoutParams().width = width;
-            btnSnoozeAlarmForAll.getLayoutParams().width = width;
-            btnStopPhoneAlarm.requestLayout();
-            btnStopAlarmForAll.requestLayout();
-            btnSnoozeAlarmForAll.requestLayout();
-        });
 
         askNotificationPermission();
         CalendarAlarmScheduler.schedulePeriodicRefresh(this);
@@ -187,11 +194,14 @@ public class MainActivity extends AppCompatActivity {
         // Bind without BIND_AUTO_CREATE: this only connects if SnapclientService is
         // already running, letting stopPhoneAlarm() know whether there's anything to stop.
         bindService(new Intent(this, SnapclientService.class), snapclientServiceConnection, 0);
+        Settings.getInstance(this).getPrefs().registerOnSharedPreferenceChangeListener(alarmModeListener);
+        updateButtons();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        Settings.getInstance(this).getPrefs().unregisterOnSharedPreferenceChangeListener(alarmModeListener);
         if (serviceBound) {
             unbindService(snapclientServiceConnection);
             serviceBound = false;
@@ -284,9 +294,55 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        // The scheduled stop is left armed: it clears the buttons and re-arms the next alarm
         BroadcastReceiver.startService(this, SnapclientService.ACTION_STOP);
-        CalendarAlarmScheduler.cancelStop(this);
         showWarning(getString(R.string.phone_alarm_stopped));
+    }
+
+    private void stopOfflineAlarm() {
+        // Cancel the scheduled playback too, in case it hasn't started yet
+        CalendarAlarmScheduler.cancelOfflinePlayback(this);
+        startService(new Intent(this, OfflineAlarmService.class).setAction(OfflineAlarmService.ACTION_STOP));
+        showWarning(getString(R.string.offline_alarm_stopped));
+    }
+
+    /**
+     * Shows the buttons for how the current alarm is being played: MUTE/STOP/SNOOZE while
+     * the snapclient is playing it, just STOP while it's being played offline, or none.
+     */
+    private void updateButtons() {
+        Settings.AlarmMode mode = Settings.getInstance(this).getAlarmMode();
+        boolean snapserver = mode == Settings.AlarmMode.SNAPSERVER;
+        boolean offline = mode == Settings.AlarmMode.OFFLINE;
+
+        btnStopPhoneAlarm.setText(buttonText(offline ? R.string.action_stop_offline_alarm : R.string.action_stop_phone_alarm,
+                R.string.action_stop_phone_alarm_subtitle));
+        btnStopPhoneAlarm.setVisibility(snapserver || offline ? View.VISIBLE : View.GONE);
+        btnStopAlarmForAll.setVisibility(snapserver ? View.VISIBLE : View.GONE);
+        btnSnoozeAlarmForAll.setVisibility(snapserver ? View.VISIBLE : View.GONE);
+        matchButtonWidths();
+    }
+
+    /**
+     * Sizes the visible buttons to the widest of them, measuring each at its natural width
+     * so the result doesn't depend on a width set by a previous call.
+     */
+    private void matchButtonWidths() {
+        List<Button> visible = new ArrayList<>();
+        for (Button button : new Button[]{btnStopPhoneAlarm, btnStopAlarmForAll, btnSnoozeAlarmForAll}) {
+            if (button.getVisibility() == View.VISIBLE)
+                visible.add(button);
+        }
+
+        int width = 0;
+        for (Button button : visible) {
+            button.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+            width = Math.max(width, button.getMeasuredWidth());
+        }
+        for (Button button : visible) {
+            button.getLayoutParams().width = width;
+            button.requestLayout();
+        }
     }
 
     private void stopAlarmForAll() {
@@ -312,14 +368,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateNextNotification() {
-        boolean enabled = Settings.getInstance(this).isNotificationsEnabled();
+        Settings settings = Settings.getInstance(this);
+        boolean enabled = settings.isNotificationsEnabled();
         tvNotificationsDisabled.setVisibility(enabled ? View.GONE : View.VISIBLE);
         float alpha = enabled ? 1f : 0.4f;
         tvNextLabel.setAlpha(alpha);
         tvNextNotification.setAlpha(alpha);
         tvNextDate.setAlpha(alpha);
 
-        List<CalendarNotification> nextGroup = CalendarAlarmScheduler.getNextGroup(this);
+        Instant after = Instant.now();
+        // An offline alarm stopped before its play time is over, so don't keep showing it as next
+        if (settings.getAlarmMode() == Settings.AlarmMode.NONE) {
+            Instant offlineAlarmPlay = Instant.ofEpochMilli(settings.getOfflineAlarmPlayMillis());
+            if (offlineAlarmPlay.isAfter(after))
+                after = offlineAlarmPlay;
+        }
+        List<CalendarNotification> nextGroup = CalendarAlarmScheduler.getNextGroup(this, after);
         if (nextGroup.isEmpty()) {
             tvNextLabel.setVisibility(View.GONE);
             tvNextNotification.setText(R.string.no_upcoming_notification);
