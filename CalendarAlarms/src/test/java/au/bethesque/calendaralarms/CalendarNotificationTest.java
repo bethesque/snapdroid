@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 @RunWith(RobolectricTestRunner.class)
 public class CalendarNotificationTest {
     private static final String START_TIME = "2026-11-02T09:00:00+11:00";
-    private static final String TEMPLATE_OPTIONS = "["
+    private static final String TEMPLATED_SENTENCES = "["
             + "{\"template\":\"Standup in {mins} minutes.\",\"min\":2,\"max\":null},"
             + "{\"template\":\"Standup is starting.\",\"min\":0,\"max\":2},"
             + "{\"template\":\"Standup started {mins} minutes ago.\",\"min\":null,\"max\":0}"
@@ -26,7 +26,7 @@ public class CalendarNotificationTest {
     private static CalendarNotification standup() throws Exception {
         return notification("{\"event\":{\"summary\":\"Standup\",\"start_time\":\"" + START_TIME + "\"},"
                 + "\"type\":\"announce\",\"play_datetime\":\"2026-11-02T08:50:00+11:00\","
-                + "\"duration_seconds\":60,\"template_options\":" + TEMPLATE_OPTIONS + "}");
+                + "\"duration_seconds\":60,\"templated_sentences\":" + TEMPLATED_SENTENCES + "}");
     }
 
     @Test
@@ -69,9 +69,23 @@ public class CalendarNotificationTest {
     }
 
     @Test
+    public void spokenTextJoinsAllMatchingTemplatesInOrder() throws Exception {
+        CalendarNotification notification = notification("{\"event\":{\"summary\":\"Standup\",\"start_time\":\"" + START_TIME + "\"},"
+                + "\"play_datetime\":\"2026-11-02T08:50:00+11:00\",\"templated_sentences\":["
+                + "{\"template\":\"Standup in {mins} minutes.\",\"min\":2,\"max\":null},"
+                + "{\"template\":\"Standup is starting.\",\"min\":0,\"max\":2},"
+                + "{\"template\":\"Ready?\",\"min\":null,\"max\":null},"
+                + "{\"template\":\"Grab a coffee\",\"min\":null,\"max\":null}"
+                + "]}");
+
+        assertEquals("Standup in 10 minutes. Ready? Grab a coffee.",
+                notification.getSpokenText(notification.getPlayDateTime()));
+    }
+
+    @Test
     public void spokenTextFallsBackWhenNoStartTime() throws Exception {
         CalendarNotification notification = notification("{\"event\":{\"summary\":\"Standup\"},"
-                + "\"play_datetime\":\"2026-11-02T08:50:00+11:00\",\"template_options\":" + TEMPLATE_OPTIONS + "}");
+                + "\"play_datetime\":\"2026-11-02T08:50:00+11:00\",\"templated_sentences\":" + TEMPLATED_SENTENCES + "}");
 
         assertEquals("It's time for Standup", notification.getSpokenText(notification.getPlayDateTime()));
     }
@@ -80,7 +94,7 @@ public class CalendarNotificationTest {
     public void spokenTextFallsBackWhenNoTemplateMatches() throws Exception {
         CalendarNotification notification = notification("{\"event\":{\"summary\":\"Standup\",\"start_time\":\"" + START_TIME + "\"},"
                 + "\"play_datetime\":\"2026-11-02T08:50:00+11:00\","
-                + "\"template_options\":[{\"template\":\"Soon\",\"min\":0,\"max\":5}]}");
+                + "\"templated_sentences\":[{\"template\":\"Soon\",\"min\":0,\"max\":5}]}");
 
         assertEquals("It's time for Standup", notification.getSpokenText(notification.getPlayDateTime()));
     }

@@ -9,22 +9,24 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * A single entry returned by the "Calendar Alarms URL" endpoint, e.g.:
  * {"event":{"summary":"...","start_time":"..."},"type":"announce","due_datetime":"...","play_datetime":"...",
- * "duration_seconds":60,"template_options":[{"template":"... in {mins} minutes.","min":2,"max":null}]}
+ * "duration_seconds":60,"templated_sentences":[{"template":"... in {mins} minutes.","min":2,"max":null}]}
  */
 public class CalendarNotification {
     private static final int DEFAULT_DURATION_SECONDS = 300;
     private static final String MINS_PLACEHOLDER = "{mins}";
+    private static final Pattern ENDS_WITH_PUNCTUATION = Pattern.compile("[.!?]$");
 
     private final String summary;
     private final OffsetDateTime startTime;
     private final String type;
     private final OffsetDateTime playDateTime;
     private final int durationSeconds;
-    private final List<TemplateOption> templateOptions = new ArrayList<>();
+    private final List<TemplatedSentence> templatedSentences = new ArrayList<>();
 
     public CalendarNotification(JSONObject json) throws JSONException, DateTimeParseException {
         JSONObject event = json.getJSONObject("event");
@@ -35,10 +37,10 @@ public class CalendarNotification {
         playDateTime = OffsetDateTime.parse(json.getString("play_datetime"));
         durationSeconds = json.optInt("duration_seconds", DEFAULT_DURATION_SECONDS);
 
-        JSONArray options = json.optJSONArray("template_options");
-        if (options != null) {
-            for (int i = 0; i < options.length(); i++) {
-                templateOptions.add(new TemplateOption(options.getJSONObject(i)));
+        JSONArray sentences = json.optJSONArray("templated_sentences");
+        if (sentences != null) {
+            for (int i = 0; i < sentences.length(); i++) {
+                templatedSentences.add(new TemplatedSentence(sentences.getJSONObject(i)));
             }
         }
     }
@@ -60,29 +62,34 @@ public class CalendarNotification {
     }
 
     /**
-     * Returns the text to speak when this notification plays at the given time, from the
-     * template option whose [min, max) range contains the whole minutes until the event
-     * starts, or "It's time for <summary>" if there's no start time or no matching option.
+     * Returns the text to speak when this notification plays at the given time, made by joining
+     * (in order, adding a full stop to any not ending in . ! or ?) every templated sentence whose [min, max) range contains the whole minutes until
+     * the event starts, or "It's time for <summary>" if there's no start time or no matching sentence.
      */
     public String getSpokenText(OffsetDateTime playTime) {
         if (startTime != null) {
             // Long division truncates towards zero, matching the server's int()
             long minutesUntilStart = Duration.between(playTime, startTime).getSeconds() / 60;
-            for (TemplateOption option : templateOptions) {
-                if (option.matches(minutesUntilStart))
-                    return option.template.replace(MINS_PLACEHOLDER, String.valueOf(Math.abs(minutesUntilStart)));
+            List<String> matching = new ArrayList<>();
+            for (TemplatedSentence sentence : templatedSentences) {
+                if (sentence.matches(minutesUntilStart)) {
+                    String text = sentence.template.replace(MINS_PLACEHOLDER, String.valueOf(Math.abs(minutesUntilStart)));
+                    matching.add(ENDS_WITH_PUNCTUATION.matcher(text).find() ? text : text + ".");
+                }
             }
+            if (!matching.isEmpty())
+                return String.join(" ", matching);
         }
         return "It's time for " + summary;
     }
 
-    private static class TemplateOption {
+    private static class TemplatedSentence {
         private final String template;
         // Null means unbounded
         private final Long min;
         private final Long max;
 
-        TemplateOption(JSONObject json) throws JSONException {
+        TemplatedSentence(JSONObject json) throws JSONException {
             template = json.getString("template");
             min = json.isNull("min") ? null : json.getLong("min");
             max = json.isNull("max") ? null : json.getLong("max");
