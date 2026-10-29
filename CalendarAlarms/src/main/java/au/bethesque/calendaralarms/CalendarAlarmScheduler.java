@@ -22,6 +22,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -304,8 +305,15 @@ public class CalendarAlarmScheduler {
      * upcoming.
      */
     public static long getNextPlayDurationMillis(Context context) {
+        return getNextPlayDurationMillis(context, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Like getNextPlayDurationMillis(Context), but for the occurrence(s) upcoming according to the given clock.
+     */
+    public static long getNextPlayDurationMillis(Context context, Clock clock) {
         long maxDurationSeconds = 0;
-        for (CalendarNotification notification : getNextGroup(context)) {
+        for (CalendarNotification notification : getNextGroup(context, clock.instant())) {
             maxDurationSeconds = Math.max(maxDurationSeconds, notification.getDurationSeconds());
         }
         return maxDurationSeconds * 1000L + LEAD_TIME_MS;
@@ -317,19 +325,26 @@ public class CalendarAlarmScheduler {
      * was found (regardless of whether the OS alarm could actually be scheduled).
      */
     public static boolean scheduleNext(Context context) {
+        return scheduleNext(context, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Like scheduleNext(Context), but for the earliest play_datetime upcoming according to the given clock.
+     */
+    public static boolean scheduleNext(Context context, Clock clock) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         PendingIntent startPendingIntent = buildStartPendingIntent(context);
         alarmManager.cancel(startPendingIntent);
 
-        CalendarNotification next = getNext(context);
+        CalendarNotification next = getNext(context, clock.instant());
         if (next == null) {
             Log.i(TAG, "scheduleNext: no upcoming notifications, nothing scheduled");
             return false;
         }
 
-        long triggerAtMillis = Math.max(System.currentTimeMillis(), next.getPlayDateTime().toInstant().toEpochMilli() - LEAD_TIME_MS);
+        long triggerAtMillis = Math.max(clock.millis(), next.getPlayDateTime().toInstant().toEpochMilli() - LEAD_TIME_MS);
         Log.i(TAG, "scheduleNext: \"" + next.getSummary() + "\" at " + next.getPlayDateTime()
-                + ", waking up at " + OffsetDateTime.ofInstant(Instant.ofEpochMilli(triggerAtMillis), ZoneId.systemDefault()));
+                + ", waking up at " + OffsetDateTime.ofInstant(Instant.ofEpochMilli(triggerAtMillis), clock.getZone()));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             Log.w(TAG, "scheduleNext: exact alarm permission not granted, cannot schedule");
@@ -362,7 +377,14 @@ public class CalendarAlarmScheduler {
      * duration_seconds in the group. Returns true if the playback was scheduled.
      */
     public static boolean scheduleOfflinePlayback(Context context) {
-        List<CalendarNotification> group = getNextGroup(context);
+        return scheduleOfflinePlayback(context, Clock.systemDefaultZone());
+    }
+
+    /**
+     * Like scheduleOfflinePlayback(Context), but for the next play_datetime according to the given clock.
+     */
+    public static boolean scheduleOfflinePlayback(Context context, Clock clock) {
+        List<CalendarNotification> group = getNextGroup(context, clock.instant());
         if (group.isEmpty())
             return false;
 
