@@ -27,7 +27,7 @@
     </queries>
 
     <application
-        android:name=".SnapcastApplication"
+        android:name="au.bethesque.calendaralarms.CalendarAlarmsApplication"
         android:allowBackup="true"
         android:banner="@mipmap/app_banner"
         android:icon="@mipmap/ic_launcher"
@@ -50,7 +50,7 @@
         </activity>
 
         <activity
-            android:name=".SnapclientActivity"
+            android:name="de.badaix.snapcast.SnapclientActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_snapcast"
             android:parentActivityName="au.bethesque.calendaralarms.MainActivity"
@@ -71,7 +71,7 @@
         </receiver>
 
         <service
-            android:name=".SnapclientService"
+            android:name="de.badaix.snapcast.SnapclientService"
             android:exported="true"
             android:foregroundServiceType="mediaPlayback" />
 
@@ -86,7 +86,7 @@
 
         <!-- android:theme="@style/Theme.AppCompat.Light.DialogWhenLarge" -->
         <activity
-            android:name=".ClientSettingsActivity"
+            android:name="de.badaix.snapcast.ClientSettingsActivity"
             android:label="@string/title_activity_client_settings"
             android:parentActivityName=".SnapclientActivity">
             <meta-data
@@ -94,7 +94,7 @@
                 android:value=".SnapclientActivity" />
         </activity>
         <activity
-            android:name=".GroupSettingsActivity"
+            android:name="de.badaix.snapcast.GroupSettingsActivity"
             android:label="@string/title_activity_group_preference"
             android:parentActivityName=".SnapclientActivity">
             <meta-data
@@ -102,7 +102,7 @@
                 android:value=".SnapclientActivity" />
         </activity>
         <activity
-            android:name=".AboutActivity"
+            android:name="de.badaix.snapcast.AboutActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_about"
             android:parentActivityName="au.bethesque.calendaralarms.MainActivity">
@@ -111,7 +111,7 @@
                 android:value="au.bethesque.calendaralarms.MainActivity" />
         </activity>
         <activity
-            android:name=".LogActivity"
+            android:name="de.badaix.snapcast.LogActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:label="@string/title_activity_logs"
             android:parentActivityName="au.bethesque.calendaralarms.MainActivity">

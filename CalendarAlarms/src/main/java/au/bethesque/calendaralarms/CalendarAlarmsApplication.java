@@ -16,13 +16,13 @@
  *     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.badaix.snapcast;
+package au.bethesque.calendaralarms;
 
 import android.app.Application;
 
 import au.bethesque.calendaralarms.utils.Log;
 
-public class SnapcastApplication extends Application {
+public class CalendarAlarmsApplication extends Application {
 
     @Override
     public void onCreate() {

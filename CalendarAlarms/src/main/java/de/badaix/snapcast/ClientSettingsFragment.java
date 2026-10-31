@@ -18,6 +18,8 @@
 
 package de.badaix.snapcast;
 
+import au.bethesque.calendaralarms.R;
+
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.Preference;

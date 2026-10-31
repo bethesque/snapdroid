@@ -18,6 +18,8 @@
 
 package de.badaix.snapcast;
 
+import au.bethesque.calendaralarms.R;
+
 import static android.os.PowerManager.FULL_WAKE_LOCK;
 import static android.os.PowerManager.PARTIAL_WAKE_LOCK;
 

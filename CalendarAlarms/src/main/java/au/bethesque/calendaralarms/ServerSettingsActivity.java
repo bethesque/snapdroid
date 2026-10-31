@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import de.badaix.snapcast.R;
 
 public class ServerSettingsActivity extends AppCompatActivity {
 

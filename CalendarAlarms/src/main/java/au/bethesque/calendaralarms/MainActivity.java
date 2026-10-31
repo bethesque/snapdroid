@@ -65,7 +65,6 @@ import java.util.stream.Collectors;
 import de.badaix.snapcast.AboutActivity;
 import de.badaix.snapcast.BroadcastReceiver;
 import de.badaix.snapcast.LogActivity;
-import de.badaix.snapcast.R;
 import de.badaix.snapcast.SnapclientActivity;
 import de.badaix.snapcast.SnapclientService;
 

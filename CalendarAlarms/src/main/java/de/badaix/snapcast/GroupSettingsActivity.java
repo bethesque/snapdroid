@@ -18,6 +18,8 @@
 
 package de.badaix.snapcast;
 
+import au.bethesque.calendaralarms.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

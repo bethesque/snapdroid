@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import au.bethesque.calendaralarms.utils.Log;
-import de.badaix.snapcast.R;
 
 /**
  * Plays a calendar notification occurrence through the alarm audio stream, for when the
