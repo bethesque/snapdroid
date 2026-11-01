@@ -8,10 +8,13 @@ android {
         minSdkVersion 21
         targetSdkVersion 35
         /* major×10000 + minor×100 + patch */
-        versionCode 100
-        versionName '0.1.0'
+        versionCode 200
+        versionName '0.2.0'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
+        // Override with -PcalendarAlarmsUrl=... or in ~/.gradle/gradle.properties
+        buildConfigField 'String', 'DEFAULT_CALENDAR_ALARMS_URL',
+                "\"${project.findProperty('calendarAlarmsUrl') ?: 'http://nas.dixon.net.au:8442'}\""
         externalNativeBuild {
             cmake {
                 version "3.22.1"
@@ -25,6 +28,7 @@ android {
     }
     buildFeatures {
         prefab true
+        buildConfig true
     }
     externalNativeBuild {
         cmake {
@@ -59,6 +63,10 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // Installs alongside the release build, which is signed with a different key
+            applicationIdSuffix '.dev'
+        }
         release {
             signingConfig signingConfigs.release
             minifyEnabled false

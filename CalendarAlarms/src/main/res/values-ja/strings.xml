@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Snapcast</string>
     <string name="ticker_text">通知ストリーマー 開始しました</string>
     <string name="notification_title">通知ストリーマー</string>
     <string name="notification_text">通知ストリーマー は実行中です…</string>

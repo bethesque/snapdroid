@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Snapcast</string>
     <string name="ticker_text">Benachrichtigungs-Streamer gestartet</string>
     <string name="notification_title">Benachrichtigungs-Streamer</string>
     <string name="notification_text">Benachrichtigungs-Streamer läuft…</string>
