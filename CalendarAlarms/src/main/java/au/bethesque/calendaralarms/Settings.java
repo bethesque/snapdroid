@@ -173,6 +173,30 @@ public class Settings {
         put("calendarAlarmsUrl", calendarAlarmsUrl);
     }
 
+    public boolean isCalendarAlarmsDev() {
+        return getBoolean("calendarAlarmsDev", false);
+    }
+
+    public void setCalendarAlarmsDev(boolean calendarAlarmsDev) {
+        put("calendarAlarmsDev", calendarAlarmsDev);
+    }
+
+    public String getCalendarAlarmsDevUrl() {
+        return getString("calendarAlarmsDevUrl", "");
+    }
+
+    public void setCalendarAlarmsDevUrl(String calendarAlarmsDevUrl) {
+        put("calendarAlarmsDevUrl", calendarAlarmsDevUrl);
+    }
+
+    /**
+     * The Calendar Alarms URL to actually connect to: the dev URL when dev is ticked,
+     * otherwise the normal URL.
+     */
+    public String getActiveCalendarAlarmsUrl() {
+        return isCalendarAlarmsDev() ? getCalendarAlarmsDevUrl() : getCalendarAlarmsUrl();
+    }
+
     public String getCalendarNotificationsJson() {
         return getString("calendarNotificationsJson", "");
     }

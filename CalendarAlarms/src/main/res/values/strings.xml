@@ -79,6 +79,7 @@
     <string name="calendar_alarms_url">URL</string>
     <string name="calendar_alarms_url_hint">http://host:port</string>
     <string name="calendar_alarms_dev">Dev</string>
+    <string name="calendar_alarms_dev_url">Dev URL</string>
     <string name="calendar_refresh_interval_minutes">Refresh interval (minutes)</string>
     <string name="calendar_refresh_interval_too_low">Refresh interval must be at least %1$d minutes</string>
     <string name="settings">Settings</string>

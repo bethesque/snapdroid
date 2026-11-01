@@ -254,7 +254,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshCalendarNotifications() {
-        if (Settings.getInstance(this).getCalendarAlarmsUrl().trim().isEmpty()) {
+        if (Settings.getInstance(this).getActiveCalendarAlarmsUrl().trim().isEmpty()) {
             showWarning(getString(R.string.calendar_alarms_url_empty));
             return;
         }
@@ -345,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopAlarmForAll() {
-        if (Settings.getInstance(this).getCalendarAlarmsUrl().trim().isEmpty()) {
+        if (Settings.getInstance(this).getActiveCalendarAlarmsUrl().trim().isEmpty()) {
             showWarning(getString(R.string.calendar_alarms_url_empty));
             return;
         }
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void snoozeAlarmForAll() {
-        if (Settings.getInstance(this).getCalendarAlarmsUrl().trim().isEmpty()) {
+        if (Settings.getInstance(this).getActiveCalendarAlarmsUrl().trim().isEmpty()) {
             showWarning(getString(R.string.calendar_alarms_url_empty));
             return;
         }

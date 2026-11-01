@@ -60,13 +60,50 @@
                 android:inputType="textUri"
                 android:textColor="?attr/colorTextOnBackground" />
 
-            <CheckBox
-                android:id="@+id/calendar_alarms_dev"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/calendar_alarms_dev"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?attr/colorTextOnBackground" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:padding="3dip"
+                    android:text="@string/calendar_alarms_dev"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?attr/colorTextOnBackground" />
+
+                <CheckBox
+                    android:id="@+id/calendar_alarms_dev"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="7dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/calendar_alarms_dev_url_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="3dip"
+                    android:text="@string/calendar_alarms_dev_url"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?attr/colorTextOnBackground" />
+
+                <EditText
+                    android:id="@+id/calendar_alarms_dev_url"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/calendar_alarms_url_hint"
+                    android:inputType="textUri"
+                    android:textColor="?attr/colorTextOnBackground" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"

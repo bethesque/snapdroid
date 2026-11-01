@@ -27,7 +27,7 @@ public class CalendarRefreshWorker extends Worker {
     @Override
     public Result doWork() {
         Context context = getApplicationContext();
-        if (Settings.getInstance(context).getCalendarAlarmsUrl().trim().isEmpty()) {
+        if (Settings.getInstance(context).getActiveCalendarAlarmsUrl().trim().isEmpty()) {
             return Result.success();
         }
 

@@ -93,7 +93,7 @@ public class CalendarAlarmScheduler {
      */
     public static void fetchAndStoreSync(Context context) throws IOException, JSONException {
         Context appContext = context.getApplicationContext();
-        String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
+        String baseUrl = Settings.getInstance(appContext).getActiveCalendarAlarmsUrl();
         String body = fetch(baseUrl.replaceAll("/+$", "") + NOTIFICATIONS_PATH);
         // Sanity-parse before persisting so garbage never overwrites a working schedule.
         new JSONObject(body);
@@ -133,7 +133,7 @@ public class CalendarAlarmScheduler {
         Handler mainHandler = new Handler(Looper.getMainLooper());
         new Thread(() -> {
             try {
-                String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
+                String baseUrl = Settings.getInstance(appContext).getActiveCalendarAlarmsUrl();
                 post(baseUrl.replaceAll("/+$", "") + STOP_ALARM_PATH);
                 mainHandler.post(onSuccess);
             } catch (Exception e) {
@@ -152,7 +152,7 @@ public class CalendarAlarmScheduler {
         Handler mainHandler = new Handler(Looper.getMainLooper());
         new Thread(() -> {
             try {
-                String baseUrl = Settings.getInstance(appContext).getCalendarAlarmsUrl();
+                String baseUrl = Settings.getInstance(appContext).getActiveCalendarAlarmsUrl();
                 post(baseUrl.replaceAll("/+$", "") + SNOOZE_ALARM_PATH);
                 mainHandler.post(onSuccess);
             } catch (Exception e) {

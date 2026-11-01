@@ -21,6 +21,7 @@ package au.bethesque.calendaralarms;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -32,13 +33,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class ServerSettingsActivity extends AppCompatActivity {
 
-    private static final String DEV_CALENDAR_ALARMS_URL = "http://192.168.20.35:8081";
-    private static final String PROD_CALENDAR_ALARMS_URL = "http://nas.dixon.net.au:8442";
-
     private EditText editHost;
     private EditText editStreamPort;
     private EditText editControlPort;
     private EditText editCalendarAlarmsUrl;
+    private EditText editCalendarAlarmsDevUrl;
+    private View calendarAlarmsDevUrlContainer;
     private EditText editCalendarRefreshIntervalMinutes;
     private CheckBox checkBoxCalendarAlarmsDev;
     private CheckBox checkBoxSnapclientEnabled;
@@ -62,6 +62,10 @@ public class ServerSettingsActivity extends AppCompatActivity {
         editCalendarAlarmsUrl = findViewById(R.id.calendar_alarms_url);
         editCalendarRefreshIntervalMinutes = findViewById(R.id.calendar_refresh_interval_minutes);
         checkBoxCalendarAlarmsDev = findViewById(R.id.calendar_alarms_dev);
+        editCalendarAlarmsDevUrl = findViewById(R.id.calendar_alarms_dev_url);
+        calendarAlarmsDevUrlContainer = findViewById(R.id.calendar_alarms_dev_url_container);
+        checkBoxCalendarAlarmsDev.setOnCheckedChangeListener((buttonView, isChecked) ->
+                calendarAlarmsDevUrlContainer.setVisibility(isChecked ? View.VISIBLE : View.GONE));
 
         spinnerAudioEngine = findViewById(R.id.audio_engine);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -71,10 +75,6 @@ public class ServerSettingsActivity extends AppCompatActivity {
         checkBoxResample = findViewById(R.id.checkBoxResample);
 
         loadSettings();
-
-        // Attached after loadSettings so restoring the checkbox state doesn't overwrite the URL.
-        checkBoxCalendarAlarmsDev.setOnCheckedChangeListener((buttonView, isChecked) ->
-                editCalendarAlarmsUrl.setText(isChecked ? DEV_CALENDAR_ALARMS_URL : PROD_CALENDAR_ALARMS_URL));
     }
 
     private void loadSettings() {
@@ -91,7 +91,8 @@ public class ServerSettingsActivity extends AppCompatActivity {
         }
         checkBoxResample.setChecked(settings.doResample());
         editCalendarAlarmsUrl.setText(settings.getCalendarAlarmsUrl());
-        checkBoxCalendarAlarmsDev.setChecked(DEV_CALENDAR_ALARMS_URL.equals(settings.getCalendarAlarmsUrl()));
+        editCalendarAlarmsDevUrl.setText(settings.getCalendarAlarmsDevUrl());
+        checkBoxCalendarAlarmsDev.setChecked(settings.isCalendarAlarmsDev());
         editCalendarRefreshIntervalMinutes.setText(Integer.toString(settings.getCalendarRefreshIntervalMinutes()));
     }
 
@@ -128,6 +129,8 @@ public class ServerSettingsActivity extends AppCompatActivity {
         settings.setHost(host, streamPort, controlPort);
         settings.setAudioEngine(spinnerAudioEngine.getSelectedItem().toString(), checkBoxResample.isChecked());
         settings.setCalendarAlarmsUrl(editCalendarAlarmsUrl.getText().toString());
+        settings.setCalendarAlarmsDevUrl(editCalendarAlarmsDevUrl.getText().toString());
+        settings.setCalendarAlarmsDev(checkBoxCalendarAlarmsDev.isChecked());
         settings.setCalendarRefreshIntervalMinutes(refreshIntervalMinutes);
         CalendarAlarmScheduler.schedulePeriodicRefresh(this);
         return true;
