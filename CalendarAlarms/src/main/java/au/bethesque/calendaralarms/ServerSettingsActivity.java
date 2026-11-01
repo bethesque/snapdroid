@@ -146,6 +146,7 @@ public class ServerSettingsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
             if (saveSettings()) {
+                setResult(RESULT_OK);
                 finish();
             }
             return true;

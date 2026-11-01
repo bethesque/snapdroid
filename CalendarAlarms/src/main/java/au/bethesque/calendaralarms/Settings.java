@@ -30,6 +30,12 @@ public class Settings {
     public static final String KEY_ALARM_MODE = "alarmMode";
 
     /**
+     * The Calendar Alarms URL used on a fresh install, until one is saved in the settings.
+     * Set at build time from the calendarAlarmsUrl Gradle property (see build.gradle).
+     */
+    public static final String DEFAULT_CALENDAR_ALARMS_URL = BuildConfig.DEFAULT_CALENDAR_ALARMS_URL;
+
+    /**
      * How the current calendar alarm is being played, decided at the pre-alarm check.
      */
     public enum AlarmMode {
@@ -150,7 +156,7 @@ public class Settings {
     }
 
     public boolean isSnapclientEnabled() {
-        return getBoolean("snapclientEnabled", true);
+        return getBoolean("snapclientEnabled", false);
     }
 
     public void setSnapclientEnabled(boolean snapclientEnabled) {
@@ -166,7 +172,7 @@ public class Settings {
     }
 
     public String getCalendarAlarmsUrl() {
-        return getString("calendarAlarmsUrl", "");
+        return getString("calendarAlarmsUrl", DEFAULT_CALENDAR_ALARMS_URL);
     }
 
     public void setCalendarAlarmsUrl(String calendarAlarmsUrl) {

@@ -121,6 +121,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
+    // The settings may have changed the Calendar Alarms URL, so re-fetch after a save
+    private final ActivityResultLauncher<Intent> settingsLauncher =
+            registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    refreshCalendarNotifications();
+                }
+            });
+
     private void askNotificationPermission() {
         // This is only necessary for API Level > 33 (TIRAMISU)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -234,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
             updateNextNotification();
             return true;
         } else if (id == R.id.action_settings) {
-            startActivity(new Intent(this, ServerSettingsActivity.class));
+            settingsLauncher.launch(new Intent(this, ServerSettingsActivity.class));
             return true;
         } else if (id == R.id.action_snapclient) {
             startActivity(new Intent(this, SnapclientActivity.class));
