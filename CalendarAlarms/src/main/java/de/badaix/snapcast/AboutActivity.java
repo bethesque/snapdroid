@@ -36,7 +36,7 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         try {
-            getSupportActionBar().setTitle(getString(R.string.about) + " Snapcast");
+            getSupportActionBar().setTitle(getString(R.string.about) + " Calendar Alarms");
         } catch (Exception e) {
             Snackbar.make(findViewById(R.id.webView), getText(R.string.action_bar_failed), Snackbar.LENGTH_LONG);
         }
