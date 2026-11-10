@@ -18,8 +18,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -240,13 +238,8 @@ public class CalendarAlarmScheduler {
         if (host.isEmpty())
             return false;
 
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host, settings.getControlPort()), SNAPSERVER_REACHABLE_TIMEOUT_MS);
-            return true;
-        } catch (IOException e) {
-            Log.i(TAG, "isSnapserverReachable: " + host + " unreachable", e);
-            return false;
-        }
+        // TEMPORARY diagnostics - see SnapserverReachabilityDiagnostics for how to remove
+        return SnapserverReachabilityDiagnostics.isReachable(context, host, settings.getControlPort(), SNAPSERVER_REACHABLE_TIMEOUT_MS);
     }
 
     /**
