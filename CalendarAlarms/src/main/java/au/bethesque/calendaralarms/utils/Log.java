@@ -123,19 +123,23 @@ public final class Log {
     }
 
     private static void log(int priority, String tag, String msg, Throwable tr) {
-        if (tr != null) {
-            android.util.Log.println(priority, tag, msg + '\n' + android.util.Log.getStackTraceString(tr));
-        } else {
-            android.util.Log.println(priority, tag, msg);
-        }
+        String fullMsg = tr != null ? msg + '\n' + describeThrowable(tr) : msg;
+        android.util.Log.println(priority, tag, fullMsg);
 
         File file = logFile;
         if (file == null) {
             return;
         }
-        String line = TIMESTAMP_FORMATTER.format(LocalDateTime.now()) + " " + priorityChar(priority) + "/" + tag + ": " + msg
-                + (tr != null ? "\n" + android.util.Log.getStackTraceString(tr) : "");
+        String line = TIMESTAMP_FORMATTER.format(LocalDateTime.now()) + " " + priorityChar(priority) + "/" + tag + ": " + fullMsg;
         ioExecutor.execute(() -> writeLine(file, line));
+    }
+
+    // android.util.Log.getStackTraceString deliberately returns "" when the cause chain
+    // contains an UnknownHostException, so always include the throwable's own
+    // class and message rather than relying on the stack trace alone.
+    private static String describeThrowable(Throwable tr) {
+        String stackTrace = android.util.Log.getStackTraceString(tr);
+        return stackTrace.isEmpty() ? tr.toString() : stackTrace;
     }
 
     private static void writeLine(File file, String line) {
