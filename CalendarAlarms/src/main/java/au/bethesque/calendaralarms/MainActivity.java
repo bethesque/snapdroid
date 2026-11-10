@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     private Button btnStopAlarmForAll;
     private Button btnSnoozeAlarmForAll;
 
+    private AlertDialog exactAlarmDialog;
+
     private boolean serviceBound = false;
     private SnapclientService snapclientService;
 
@@ -140,6 +142,34 @@ public class MainActivity extends AppCompatActivity {
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
             }
         }
+    }
+
+    /**
+     * Prompts the user to grant the exact alarm permission if it hasn't been granted.
+     *
+     * @return true if the permission is missing (and the prompt is showing)
+     */
+    private boolean askExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S)
+            return false;
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager.canScheduleExactAlarms())
+            return false;
+
+        if (exactAlarmDialog == null || !exactAlarmDialog.isShowing()) {
+            exactAlarmDialog = new AlertDialog.Builder(this)
+                    .setTitle(R.string.exact_alarm_permission_title)
+                    .setMessage(R.string.exact_alarm_permission_message)
+                    .setPositiveButton(R.string.open_settings, (dialog, which) -> {
+                        Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                                Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        }
+        return true;
     }
 
     @Override
@@ -203,11 +233,19 @@ public class MainActivity extends AppCompatActivity {
         bindService(new Intent(this, SnapclientService.class), snapclientServiceConnection, 0);
         Settings.getInstance(this).getPrefs().registerOnSharedPreferenceChangeListener(alarmModeListener);
         updateButtons();
+        // In onStart rather than onResume so it isn't re-shown when the notification
+        // permission dialog closes, but is re-shown when returning from system settings
+        askExactAlarmPermission();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        // onStart re-shows it if still needed; dismissing avoids leaking its window on rotation
+        if (exactAlarmDialog != null) {
+            exactAlarmDialog.dismiss();
+            exactAlarmDialog = null;
+        }
         Settings.getInstance(this).getPrefs().unregisterOnSharedPreferenceChangeListener(alarmModeListener);
         if (serviceBound) {
             unbindService(snapclientServiceConnection);
@@ -267,22 +305,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            if (!alarmManager.canScheduleExactAlarms()) {
-                new AlertDialog.Builder(this)
-                        .setTitle(R.string.exact_alarm_permission_title)
-                        .setMessage(R.string.exact_alarm_permission_message)
-                        .setPositiveButton(R.string.open_settings, (dialog, which) -> {
-                            Intent intent = new Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                                    Uri.parse("package:" + getPackageName()));
-                            startActivity(intent);
-                        })
-                        .setNegativeButton(android.R.string.cancel, null)
-                        .show();
-                return;
-            }
-        }
+        if (askExactAlarmPermission())
+            return;
 
         CalendarAlarmScheduler.fetchAndStore(this,
                 () -> {
