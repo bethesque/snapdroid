@@ -8,8 +8,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 35
         /* major×10000 + minor×100 + patch */
-        versionCode 200
-        versionName '0.2.0'
+        versionCode 300
+        versionName '0.3.0'
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         // Override with -PcalendarAlarmsUrl=... or in ~/.gradle/gradle.properties
